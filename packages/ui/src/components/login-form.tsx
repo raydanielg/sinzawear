@@ -44,7 +44,8 @@ export function LoginForm({
       }
 
       if (typeof window !== "undefined") {
-        localStorage.setItem("token", data.data.token)
+        localStorage.setItem("token", data.data.accessToken)
+        localStorage.setItem("refreshToken", data.data.refreshToken)
         localStorage.setItem("user", JSON.stringify(data.data.user))
       }
 
