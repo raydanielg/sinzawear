@@ -117,6 +117,7 @@ const data = {
       ),
       items: [
         { title: "Expenses", url: "/dashboard/expenses" },
+        { title: "Accounting", url: "/dashboard/accounting" },
         { title: "Cash Register", url: "/dashboard/cash-register" },
       ],
     },

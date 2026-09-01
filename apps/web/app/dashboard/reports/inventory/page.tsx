@@ -10,6 +10,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Download04Icon, Package02Icon } from "@hugeicons/core-free-icons"
 import { api, formatTZS } from "@/lib/api"
+import jsPDF from "jspdf"
+import autoTable from "jspdf-autotable"
 
 export default function InventoryReportPage() {
   const [data, setData] = useState<any>(null)
@@ -34,12 +36,53 @@ export default function InventoryReportPage() {
       { label: "Reports", href: "/dashboard/reports" },
       { label: "Inventory Report" },
     ]}>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Inventory Report</h1>
           <p className="text-sm text-muted-foreground">Stock valuation, turnover, and low stock alerts</p>
         </div>
-        <Button variant="outline"><HugeiconsIcon icon={Download04Icon} strokeWidth={2} className="size-4" /> Export</Button>
+        <Button variant="outline" onClick={() => {
+          if (!data) return
+          const doc = new jsPDF()
+          const pw = doc.internal.pageSize.getWidth()
+          doc.setFontSize(20); doc.setFont("helvetica", "bold")
+          doc.text("Sinza Classic Wear", pw / 2, 20, { align: "center" })
+          doc.setFontSize(14); doc.setFont("helvetica", "normal")
+          doc.text("Inventory Report", pw / 2, 28, { align: "center" })
+          doc.setFontSize(10)
+          doc.text(`Generated: ${new Date().toLocaleString()}`, pw / 2, 35, { align: "center" })
+          autoTable(doc, {
+            startY: 45,
+            head: [["Metric", "Value"]],
+            body: [
+              ["Total Items", String(data.totalItems || 0)],
+              ["Stock Value (Cost)", formatTZS(data.stockValue || 0)],
+              ["Retail Value", formatTZS(data.retailValue || 0)],
+              ["Low Stock Items", String(data.lowStockCount || 0)],
+            ],
+            theme: "striped",
+            headStyles: { fillColor: [99, 102, 241] },
+            margin: { left: 15, right: 15 },
+          })
+          if (data.lowStock?.length) {
+            autoTable(doc, {
+              startY: (doc as any).lastAutoTable.finalY + 10,
+              head: [["Product", "SKU", "Branch", "Qty", "Reorder Level", "Status"]],
+              body: data.lowStock.map((item: any) => [
+                item.variant?.product?.name || "—",
+                item.variant?.sku || "—",
+                item.branch?.name || "—",
+                String(item.quantity),
+                String(item.variant?.reorderLevel || 0),
+                item.quantity === 0 ? "Out" : "Low",
+              ]),
+              theme: "striped",
+              headStyles: { fillColor: [99, 102, 241] },
+              margin: { left: 15, right: 15 },
+            })
+          }
+          doc.save(`Inventory_Report_${new Date().toISOString().split("T")[0]}.pdf`)
+        }}><HugeiconsIcon icon={Download04Icon} strokeWidth={2} className="size-4" /> Export PDF</Button>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -78,6 +121,7 @@ export default function InventoryReportPage() {
           {loading ? (
             <div className="space-y-3 p-6">{[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-12 w-full" />)}</div>
           ) : data?.lowStock?.length > 0 ? (
+            <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -104,6 +148,7 @@ export default function InventoryReportPage() {
                 ))}
               </TableBody>
             </Table>
+            </div>
           ) : (
             <div className="p-6 text-center text-sm text-muted-foreground">No low stock items</div>
           )}

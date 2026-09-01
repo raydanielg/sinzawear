@@ -79,7 +79,7 @@ export default function DashboardPage() {
 
   return (
     <DashboardLayout breadcrumbs={[{ label: "Dashboard" }, { label: "Overview" }]}>
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">{greeting}, {userName}</h1>
           <p className="text-sm text-muted-foreground">{today}</p>
@@ -93,7 +93,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Stat Cards - 2 column grid, plain icons */}
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {statCards.map((stat, i) => (
           <Card key={i} className="overflow-hidden">
             <CardContent className="p-5">
@@ -238,6 +238,7 @@ export default function DashboardPage() {
                 <div className="mt-3"><Link href="/dashboard/pos"><Button size="sm"><HugeiconsIcon icon={Cash01Icon} strokeWidth={2} className="size-4" /> New Sale</Button></Link></div>
               </div>
             ) : (
+              <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -250,7 +251,7 @@ export default function DashboardPage() {
                 </TableHeader>
                 <TableBody>
                   {recentSales.map((sale) => (
-                    <TableRow key={sale.id} className="cursor-pointer hover:bg-muted/50">
+                    <TableRow key={sale.id} className="cursor-pointer hover:bg-muted/50" onClick={() => window.location.href = `/dashboard/sales/${sale.id}`}>
                       <TableCell className="font-medium">{sale.saleNumber}</TableCell>
                       <TableCell className="text-muted-foreground">{sale.cashier?.name || "—"}</TableCell>
                       <TableCell className="text-muted-foreground">{sale.items?.length || 0} items</TableCell>
@@ -260,6 +261,7 @@ export default function DashboardPage() {
                   ))}
                 </TableBody>
               </Table>
+              </div>
             )}
           </CardContent>
         </Card>
@@ -282,6 +284,7 @@ export default function DashboardPage() {
             ) : lowStock.length === 0 ? (
               <div className="p-6 text-center text-sm text-muted-foreground">All products are well stocked</div>
             ) : (
+              <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -310,6 +313,7 @@ export default function DashboardPage() {
                   ))}
                 </TableBody>
               </Table>
+              </div>
             )}
           </CardContent>
         </Card>

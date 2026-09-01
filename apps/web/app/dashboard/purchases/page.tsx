@@ -46,7 +46,7 @@ export default function PurchasesPage() {
 
   return (
     <DashboardLayout breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Purchasing", href: "/dashboard/purchases" }, { label: "Purchases" }]}>
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Purchases</h1>
           <p className="text-sm text-muted-foreground">Stock received from suppliers</p>
@@ -61,9 +61,9 @@ export default function PurchasesPage() {
               <CardTitle>All Purchases</CardTitle>
               <CardDescription>Goods received notes and supplier invoices</CardDescription>
             </div>
-            <div className="relative">
+            <div className="relative w-full sm:w-48">
               <HugeiconsIcon icon={Search01Icon} strokeWidth={2} className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input placeholder="Search PO or supplier..." value={search} onChange={(e) => setSearch(e.target.value)} className="h-9 w-48 pl-8" />
+              <Input placeholder="Search PO or supplier..." value={search} onChange={(e) => setSearch(e.target.value)} className="h-9 w-full pl-8" />
             </div>
           </div>
         </CardHeader>
@@ -82,6 +82,7 @@ export default function PurchasesPage() {
               <Link href="/dashboard/purchases/new"><Button size="sm"><HugeiconsIcon icon={PlusIcon} strokeWidth={2} className="size-4" /> New Purchase</Button></Link>
             </div>
           ) : (
+            <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -112,6 +113,7 @@ export default function PurchasesPage() {
                 ))}
               </TableBody>
             </Table>
+            </div>
           )}
         </CardContent>
       </Card>

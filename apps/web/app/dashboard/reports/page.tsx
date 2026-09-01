@@ -12,6 +12,8 @@ import { HugeiconsIcon } from "@hugeicons/react"
 import { ChartIcon, CoinsIcon, Package02Icon, ShoppingBag01Icon, Store01Icon, Download04Icon } from "@hugeicons/core-free-icons"
 import { api, formatTZS } from "@/lib/api"
 import type { Branch } from "@/lib/types"
+import jsPDF from "jspdf"
+import autoTable from "jspdf-autotable"
 
 interface PnLData {
   revenue: number
@@ -68,27 +70,54 @@ export default function ReportsPage() {
 
   return (
     <DashboardLayout breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Reports" }]}>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Reports</h1>
           <p className="text-sm text-muted-foreground">Financial and inventory analytics</p>
         </div>
-        <Button variant="outline"><HugeiconsIcon icon={Download04Icon} strokeWidth={2} className="size-4" /> Export</Button>
+        <Button variant="outline" onClick={() => {
+          if (!pnl) return
+          const doc = new jsPDF()
+          const pw = doc.internal.pageSize.getWidth()
+          doc.setFontSize(20); doc.setFont("helvetica", "bold")
+          doc.text("Sinza Classic Wear", pw / 2, 20, { align: "center" })
+          doc.setFontSize(14); doc.setFont("helvetica", "normal")
+          doc.text("P&L Summary Report", pw / 2, 28, { align: "center" })
+          doc.setFontSize(10)
+          doc.text(`Period: ${fromDate || "All time"} to ${toDate || "Today"}`, pw / 2, 35, { align: "center" })
+          doc.text(`Generated: ${new Date().toLocaleString()}`, pw / 2, 41, { align: "center" })
+          autoTable(doc, {
+            startY: 50,
+            head: [["Description", "Amount (TZS)"]],
+            body: [
+              ["Revenue", formatTZS(pnl.revenue)],
+              ["COGS", `(${formatTZS(pnl.cogs)})`],
+              ["Gross Profit", formatTZS(pnl.grossProfit)],
+              ["Operating Expenses", `(${formatTZS(pnl.totalExpenses)})`],
+              ["Net Profit", formatTZS(pnl.netProfit)],
+            ],
+            foot: [["Profit Margin", `${pnl.profitMargin}%`]],
+            theme: "striped",
+            headStyles: { fillColor: [99, 102, 241] },
+            margin: { left: 15, right: 15 },
+          })
+          doc.save(`PnL_Summary_${new Date().toISOString().split("T")[0]}.pdf`)
+        }}><HugeiconsIcon icon={Download04Icon} strokeWidth={2} className="size-4" /> Export PDF</Button>
       </div>
 
       <Card>
-        <CardContent className="flex flex-wrap items-end gap-4 p-4">
+        <CardContent className="flex flex-wrap items-end gap-3 p-4 sm:gap-4">
           <div className="space-y-1">
             <Label className="text-xs">From Date</Label>
-            <Input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="h-9 w-40" />
+            <Input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="h-9 w-full sm:w-40" />
           </div>
           <div className="space-y-1">
             <Label className="text-xs">To Date</Label>
-            <Input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="h-9 w-40" />
+            <Input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="h-9 w-full sm:w-40" />
           </div>
           <div className="space-y-1">
             <Label className="text-xs">Branch</Label>
-            <select className="h-9 w-40 rounded-md border bg-background px-3 text-sm" value={branchId} onChange={(e) => setBranchId(e.target.value)}>
+            <select className="h-9 w-full rounded-md border bg-background px-3 text-sm sm:w-40" value={branchId} onChange={(e) => setBranchId(e.target.value)}>
               <option value="">All branches</option>
               {branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
             </select>

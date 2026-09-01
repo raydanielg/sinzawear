@@ -9,12 +9,19 @@ import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import { Skeleton } from "@workspace/ui/components/skeleton"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@workspace/ui/components/table"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@workspace/ui/components/dialog"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@workspace/ui/components/sheet"
 import { toast } from "sonner"
 import { HugeiconsIcon } from "@hugeicons/react"
-import { PlusIcon, UserGroupIcon, Search01Icon } from "@hugeicons/core-free-icons"
+import { PlusIcon, UserGroupIcon, Search01Icon, Edit02Icon, TrashIcon } from "@hugeicons/core-free-icons"
 import { api, formatDate } from "@/lib/api"
 import type { User, Branch } from "@/lib/types"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@workspace/ui/components/dropdown-menu"
 
 const roleColors: Record<string, "default" | "secondary" | "destructive"> = {
   super_admin: "default",
@@ -31,7 +38,8 @@ export default function UsersPage() {
   const [search, setSearch] = useState("")
   const [dialogOpen, setDialogOpen] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [formData, setFormData] = useState({ name: "", email: "", phone: "", password: "", role: "cashier", branchId: "" })
+  const [editingUser, setEditingUser] = useState<User | null>(null)
+  const [formData, setFormData] = useState({ name: "", email: "", phone: "", password: "", confirmPassword: "", role: "cashier", branchId: "" })
 
   useEffect(() => {
     async function fetchData() {
@@ -55,39 +63,93 @@ export default function UsersPage() {
     return u.name?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q) || u.role?.toLowerCase().includes(q)
   })
 
+  function openAdd() {
+    setEditingUser(null)
+    setFormData({ name: "", email: "", phone: "", password: "", confirmPassword: "", role: "cashier", branchId: "" })
+    setDialogOpen(true)
+  }
+
+  function openEdit(user: User) {
+    setEditingUser(user)
+    setFormData({ name: user.name, email: user.email, phone: user.phone || "", password: "", confirmPassword: "", role: user.role, branchId: user.branch?.id || "" })
+    setDialogOpen(true)
+  }
+
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault()
-    if (!formData.name || !formData.email || !formData.password) { toast.error("Name, email, and password are required"); return }
+    if (!formData.name || !formData.email) { toast.error("Name and email are required"); return }
+    if (!editingUser && !formData.password) { toast.error("Password is required for new users"); return }
+    if (formData.password && formData.password !== formData.confirmPassword) { toast.error("Passwords do not match"); return }
+    if (formData.password && formData.password.length < 6) { toast.error("Password must be at least 6 characters"); return }
     setSaving(true)
     try {
-      const res = await api.post("/users", {
-        ...formData,
+      const payload: Record<string, unknown> = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone || undefined,
+        role: formData.role,
         branchId: formData.branchId || undefined,
-      })
+      }
+      if (formData.password) payload.password = formData.password
+      let res
+      if (editingUser) {
+        res = await api.put(`/users/${editingUser.id}`, payload)
+      } else {
+        res = await api.post("/users", payload)
+      }
       if (res.success) {
-        toast.success("User added!")
+        toast.success(editingUser ? "User updated!" : "User added!")
         setDialogOpen(false)
-        setFormData({ name: "", email: "", phone: "", password: "", role: "cashier", branchId: "" })
+        setFormData({ name: "", email: "", phone: "", password: "", confirmPassword: "", role: "cashier", branchId: "" })
         const refresh = await api.get("/users")
         if (refresh.success) setUsers(refresh.data.users || [])
       } else {
-        toast.error(res.message || "Failed to add user")
+        toast.error(res.message || "Failed to save user")
       }
     } catch {
-      toast.error("Failed to add user")
+      toast.error("Failed to save user")
     } finally {
       setSaving(false)
     }
   }
 
+  async function handleDelete(user: User) {
+    if (!confirm(`Delete user "${user.name}"? This cannot be undone.`)) return
+    try {
+      const res = await api.delete(`/users/${user.id}`)
+      if (res.success) {
+        toast.success("User deleted")
+        setUsers((prev) => prev.filter((u) => u.id !== user.id))
+      } else {
+        toast.error(res.message || "Failed to delete user")
+      }
+    } catch {
+      toast.error("Failed to delete user")
+    }
+  }
+
+  async function toggleActive(user: User) {
+    try {
+      const res = await api.put(`/users/${user.id}`, { isActive: !user.isActive })
+      if (res.success) {
+        toast.success(`User ${!user.isActive ? "activated" : "deactivated"}`)
+        setUsers((prev) => prev.map((u) => u.id === user.id ? { ...u, isActive: !u.isActive } : u))
+      } else {
+        toast.error(res.message || "Failed to update user")
+      }
+    } catch {
+      toast.error("Failed to update user")
+    }
+  }
+
   return (
     <DashboardLayout breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Management", href: "/dashboard/branches" }, { label: "Users" }]}>
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Users</h1>
           <p className="text-sm text-muted-foreground">Manage system users and their roles</p>
         </div>
-        <Button onClick={() => setDialogOpen(true)}><HugeiconsIcon icon={PlusIcon} strokeWidth={2} className="size-4" /> Add User</Button>
+        <Button onClick={openAdd}><HugeiconsIcon icon={PlusIcon} strokeWidth={2} className="size-4" /> Add User</Button>
       </div>
 
       <Card>
@@ -97,9 +159,9 @@ export default function UsersPage() {
               <CardTitle>All Users</CardTitle>
               <CardDescription>{loading ? "Loading..." : `${filtered.length} users`}</CardDescription>
             </div>
-            <div className="relative">
+            <div className="relative w-full sm:w-48">
               <HugeiconsIcon icon={Search01Icon} strokeWidth={2} className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} className="h-9 w-48 pl-8" />
+              <Input placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} className="h-9 w-full pl-8" />
             </div>
           </div>
         </CardHeader>
@@ -117,6 +179,7 @@ export default function UsersPage() {
               </div>
             </div>
           ) : (
+            <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -127,6 +190,7 @@ export default function UsersPage() {
                   <TableHead>Branch</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Joined</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -147,17 +211,37 @@ export default function UsersPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-muted-foreground">{formatDate(user.createdAt)}</TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger render={<Button size="sm" variant="ghost" className="h-8 w-8 p-0" />}>
+                          <HugeiconsIcon icon={Edit02Icon} strokeWidth={2} className="size-4" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => openEdit(user)}>
+                            <HugeiconsIcon icon={Edit02Icon} strokeWidth={2} className="size-4" /> Edit User
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => toggleActive(user)}>
+                            {user.isActive ? "Deactivate" : "Activate"}
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(user)}>
+                            <HugeiconsIcon icon={TrashIcon} strokeWidth={2} className="size-4" /> Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
+            </div>
           )}
         </CardContent>
       </Card>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Add User</DialogTitle></DialogHeader>
+      <Sheet open={dialogOpen} onOpenChange={setDialogOpen}>
+        <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+          <SheetHeader><SheetTitle>{editingUser ? "Edit User" : "Add User"}</SheetTitle></SheetHeader>
           <form onSubmit={handleAdd} className="space-y-4">
             <div className="space-y-2">
               <Label>Name *</Label>
@@ -168,8 +252,12 @@ export default function UsersPage() {
               <Input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} placeholder="Email address" required />
             </div>
             <div className="space-y-2">
-              <Label>Password *</Label>
-              <Input type="password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} placeholder="Password" required />
+              <Label>{editingUser ? "New Password (leave blank to keep)" : "Password *"}</Label>
+              <Input type="password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} placeholder={editingUser ? "Leave blank to keep current" : "Password"} {...(!editingUser ? { required: true } : {})} />
+            </div>
+            <div className="space-y-2">
+              <Label>Confirm Password</Label>
+              <Input type="password" value={formData.confirmPassword} onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })} placeholder="Confirm password" />
             </div>
             <div className="space-y-2">
               <Label>Phone</Label>
@@ -192,13 +280,15 @@ export default function UsersPage() {
                 {branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
               </select>
             </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
-              <Button type="submit" disabled={saving}>{saving ? "Saving..." : "Add User"}</Button>
-            </DialogFooter>
+            <SheetFooter className="mt-auto pt-4">
+              <div className="flex flex-col gap-2">
+                <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
+                <Button type="submit" disabled={saving}>{saving ? "Saving..." : editingUser ? "Save Changes" : "Add User"}</Button>
+              </div>
+            </SheetFooter>
           </form>
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
     </DashboardLayout>
   )
 }

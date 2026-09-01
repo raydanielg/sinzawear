@@ -9,7 +9,7 @@ import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import { Skeleton } from "@workspace/ui/components/skeleton"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@workspace/ui/components/table"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@workspace/ui/components/dialog"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@workspace/ui/components/sheet"
 import { toast } from "sonner"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { PlusIcon, ShieldKeyIcon } from "@hugeicons/core-free-icons"
@@ -88,7 +88,7 @@ export default function RolesPage() {
       { label: "Management", href: "/dashboard/branches" },
       { label: "Roles & Permissions" },
     ]}>
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Roles & Permissions</h1>
           <p className="text-sm text-muted-foreground">Define roles and assign permissions</p>
@@ -113,6 +113,7 @@ export default function RolesPage() {
               </div>
             </div>
           ) : (
+            <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -142,13 +143,14 @@ export default function RolesPage() {
                 ))}
               </TableBody>
             </Table>
+            </div>
           )}
         </CardContent>
       </Card>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader><DialogTitle>Add Role</DialogTitle></DialogHeader>
+      <Sheet open={dialogOpen} onOpenChange={setDialogOpen}>
+        <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+          <SheetHeader><SheetTitle>Add Role</SheetTitle></SheetHeader>
           <form onSubmit={handleAdd} className="space-y-4">
             <div className="space-y-2">
               <Label>Name *</Label>
@@ -160,7 +162,7 @@ export default function RolesPage() {
             </div>
             <div className="space-y-2">
               <Label>Permissions</Label>
-              <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto rounded-md border p-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-64 overflow-y-auto rounded-md border p-3">
                 {allPermissions.map((perm) => (
                   <label key={perm} className="flex items-center gap-2 text-sm">
                     <input
@@ -174,13 +176,15 @@ export default function RolesPage() {
                 ))}
               </div>
             </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
-              <Button type="submit" disabled={saving}>{saving ? "Saving..." : "Create Role"}</Button>
-            </DialogFooter>
+            <SheetFooter className="mt-auto pt-4">
+              <div className="flex flex-col gap-2">
+                <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
+                <Button type="submit" disabled={saving}>{saving ? "Saving..." : "Create Role"}</Button>
+              </div>
+            </SheetFooter>
           </form>
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
     </DashboardLayout>
   )
 }

@@ -10,7 +10,7 @@ import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import { Skeleton } from "@workspace/ui/components/skeleton"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@workspace/ui/components/table"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@workspace/ui/components/dialog"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@workspace/ui/components/sheet"
 import { toast } from "sonner"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { CashierIcon, PlayIcon, StopIcon, EyeIcon } from "@hugeicons/core-free-icons"
@@ -96,7 +96,7 @@ export default function CashRegisterPage() {
       { label: "Finance", href: "/dashboard/expenses" },
       { label: "Cash Register" },
     ]}>
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Cash Register</h1>
           <p className="text-sm text-muted-foreground">Manage cash drawer sessions</p>
@@ -114,9 +114,9 @@ export default function CashRegisterPage() {
 
       {activeSession && (
         <Card className="border-primary/50 bg-primary/5">
-          <CardContent className="flex items-center justify-between p-5">
+          <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-4">
-              <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
                 <HugeiconsIcon icon={CashierIcon} strokeWidth={2} className="size-6" />
               </div>
               <div>
@@ -124,12 +124,12 @@ export default function CashRegisterPage() {
                 <p className="text-sm text-muted-foreground">Opened {formatDateTime(activeSession.openedAt)}</p>
               </div>
             </div>
-            <div className="flex items-center gap-6">
-              <div className="text-right">
+            <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+              <div className="text-left sm:text-right">
                 <p className="text-sm text-muted-foreground">Opening Float</p>
                 <p className="text-lg font-bold">{formatTZS(activeSession.openingFloat)}</p>
               </div>
-              <div className="text-right">
+              <div className="text-left sm:text-right">
                 <p className="text-sm text-muted-foreground">Expected Cash</p>
                 <p className="text-lg font-bold">{formatTZS(activeSession.expectedCash || 0)}</p>
               </div>
@@ -157,6 +157,7 @@ export default function CashRegisterPage() {
               </div>
             </div>
           ) : (
+            <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -191,26 +192,29 @@ export default function CashRegisterPage() {
                 ))}
               </TableBody>
             </Table>
+            </div>
           )}
         </CardContent>
       </Card>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Open Cash Session</DialogTitle></DialogHeader>
+      <Sheet open={dialogOpen} onOpenChange={setDialogOpen}>
+        <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+          <SheetHeader><SheetTitle>Open Cash Session</SheetTitle></SheetHeader>
           <form onSubmit={handleOpenSession} className="space-y-4">
             <div className="space-y-2">
               <Label>Opening Float (TZS)</Label>
               <Input type="number" min="0" value={openAmount} onChange={(e) => setOpenAmount(e.target.value)} placeholder="0" />
               <p className="text-xs text-muted-foreground">Count the cash in the drawer and enter the amount</p>
             </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
-              <Button type="submit" disabled={saving}>{saving ? "Opening..." : "Open Session"}</Button>
-            </DialogFooter>
+            <SheetFooter className="mt-auto pt-4">
+              <div className="flex flex-col gap-2">
+                <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
+                <Button type="submit" disabled={saving}>{saving ? "Opening..." : "Open Session"}</Button>
+              </div>
+            </SheetFooter>
           </form>
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
     </DashboardLayout>
   )
 }

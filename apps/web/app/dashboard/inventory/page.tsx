@@ -103,9 +103,9 @@ export default function InventoryPage() {
               <CardTitle>Stock by Branch</CardTitle>
               <CardDescription>Current inventory levels across all branches</CardDescription>
             </div>
-            <div className="relative">
+            <div className="relative w-full sm:w-48">
               <HugeiconsIcon icon={Search01Icon} strokeWidth={2} className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} className="h-9 w-48 pl-8" />
+              <Input placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} className="h-9 w-full pl-8" />
             </div>
           </div>
         </CardHeader>
@@ -119,6 +119,7 @@ export default function InventoryPage() {
               No stock data. Add products and create purchases to build inventory.
             </div>
           ) : (
+            <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -155,6 +156,7 @@ export default function InventoryPage() {
                 ))}
               </TableBody>
             </Table>
+            </div>
           )}
         </CardContent>
       </Card>

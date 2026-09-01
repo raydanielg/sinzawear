@@ -13,6 +13,9 @@ import { HugeiconsIcon } from "@hugeicons/react"
 import { PrinterIcon, DownloadIcon, ReturnRequestIcon, ArrowLeft01Icon } from "@hugeicons/core-free-icons"
 import { api, formatTZS, formatDateTime } from "@/lib/api"
 import type { Sale } from "@/lib/types"
+import jsPDF from "jspdf"
+import autoTable from "jspdf-autotable"
+import { toast } from "sonner"
 
 export default function SaleDetailsPage() {
   const params = useParams()
@@ -39,7 +42,7 @@ export default function SaleDetailsPage() {
       { label: "Sales", href: "/dashboard/sales" },
       { label: "Sale Details" },
     ]}>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => router.back()}>
             <HugeiconsIcon icon={ArrowLeft01Icon} strokeWidth={2} className="size-5" />
@@ -56,10 +59,52 @@ export default function SaleDetailsPage() {
             )}
           </div>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline"><HugeiconsIcon icon={PrinterIcon} strokeWidth={2} className="size-4" /> Print Receipt</Button>
-          <Button variant="outline"><HugeiconsIcon icon={DownloadIcon} strokeWidth={2} className="size-4" /> Download PDF</Button>
-          <Button variant="destructive"><HugeiconsIcon icon={ReturnRequestIcon} strokeWidth={2} className="size-4" /> Return</Button>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" onClick={() => {
+              if (!sale) return
+              const w = window.open("", "_blank", "width=400,height=600")
+              if (!w) { toast.error("Pop-up blocked"); return }
+              w.document.write(`
+                <html><head><title>Receipt ${sale.saleNumber}</title>
+                <style>body{font-family:monospace;font-size:12px;padding:16px;max-width:320px;margin:0 auto}h2{text-align:center}hr{border:1px dashed #ccc;margin:8px 0}table{width:100%}td{padding:2px 0}.right{text-align:right}.center{text-align:center}</style>
+                </head><body>
+                <h2>Sinza Classic Wear</h2><p class="center">Receipt #${sale.saleNumber}</p><p class="center">${formatDateTime(sale.createdAt)}</p><hr>
+                <table>${(sale.items||[]).map(i=>`<tr><td>${i.quantity}x ${i.variant?.product?.name||""}</td><td class="right">${formatTZS(i.total)}</td></tr>`).join("")}</table><hr>
+                <table><tr><td>Subtotal</td><td class="right">${formatTZS(sale.subtotal)}</td></tr><tr><td>Discount</td><td class="right">${formatTZS(sale.discount)}</td></tr><tr style="font-weight:bold"><td>TOTAL</td><td class="right">${formatTZS(sale.total)}</td></tr></table><hr>
+                <p class="center">Thank you!</p></body></html>`)
+              w.document.close(); w.focus(); setTimeout(()=>{w.print();w.close()},300)
+            }}><HugeiconsIcon icon={PrinterIcon} strokeWidth={2} className="size-4" /> <span className="hidden sm:inline">Print</span></Button>
+            <Button variant="outline" onClick={() => {
+              if (!sale) return
+              const doc = new jsPDF()
+              const pw = doc.internal.pageSize.getWidth()
+              doc.setFontSize(20); doc.setFont("helvetica","bold")
+              doc.text("Sinza Classic Wear", pw/2, 20, { align: "center" })
+              doc.setFontSize(14); doc.setFont("helvetica","normal")
+              doc.text(`Receipt #${sale.saleNumber}`, pw/2, 28, { align: "center" })
+              doc.setFontSize(10)
+              doc.text(`Date: ${formatDateTime(sale.createdAt)}`, pw/2, 35, { align: "center" })
+              autoTable(doc, {
+                startY: 45,
+                head: [["Item","Qty","Price","Total"]],
+                body: (sale.items||[]).map(i=>[`${i.variant?.product?.name||""} ${i.variant?.color?.name||""} ${i.variant?.size?.name||""}`.trim(), String(i.quantity), formatTZS(i.unitPrice), formatTZS(i.total)]),
+                theme: "striped", headStyles: { fillColor: [99,102,241] }, margin: { left: 15, right: 15 },
+              })
+              const fy = (doc as any).lastAutoTable.finalY + 10
+              autoTable(doc, { startY: fy, body: [["Subtotal",formatTZS(sale.subtotal)],["Discount",formatTZS(sale.discount)],["TOTAL",formatTZS(sale.total)]], columnStyles: { 0: { fontStyle: "bold", cellWidth: 120 }, 1: { halign: "right", fontStyle: "bold" } }, margin: { left: 15, right: 15 } })
+              doc.save(`Receipt_${sale.saleNumber}.pdf`)
+            }}><HugeiconsIcon icon={DownloadIcon} strokeWidth={2} className="size-4" /> <span className="hidden sm:inline">PDF</span></Button>
+            <Button variant="destructive" onClick={async () => {
+              if (!sale) return
+              if (!confirm(`Process return for receipt ${sale.saleNumber}?`)) return
+              try {
+                const res = await api.post(`/sales/${sale.id}/return`, {})
+                if (res.success) { toast.success("Return processed"); router.push("/dashboard/sales") }
+                else toast.error(res.message || "Failed")
+              } catch { toast.error("Failed to process return") }
+            }}><HugeiconsIcon icon={ReturnRequestIcon} strokeWidth={2} className="size-4" /> <span className="hidden sm:inline">Return</span></Button>
+          </div>
         </div>
       </div>
 
@@ -76,6 +121,7 @@ export default function SaleDetailsPage() {
                 <CardTitle>Items</CardTitle>
               </CardHeader>
               <CardContent className="p-0">
+                <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -100,6 +146,7 @@ export default function SaleDetailsPage() {
                     ))}
                   </TableBody>
                 </Table>
+                </div>
               </CardContent>
             </Card>
 

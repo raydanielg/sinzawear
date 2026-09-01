@@ -11,6 +11,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Download04Icon, CoinsIcon } from "@hugeicons/core-free-icons"
 import { api, formatTZS } from "@/lib/api"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+import jsPDF from "jspdf"
+import autoTable from "jspdf-autotable"
 
 export default function PurchaseReportPage() {
   const [data, setData] = useState<any>(null)
@@ -41,23 +44,57 @@ export default function PurchaseReportPage() {
       { label: "Reports", href: "/dashboard/reports" },
       { label: "Purchase Report" },
     ]}>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Purchase Report</h1>
           <p className="text-sm text-muted-foreground">Purchases by supplier, branch, and period</p>
         </div>
-        <Button variant="outline"><HugeiconsIcon icon={Download04Icon} strokeWidth={2} className="size-4" /> Export</Button>
+        <Button variant="outline" onClick={() => {
+          if (!data) return
+          const doc = new jsPDF()
+          const pw = doc.internal.pageSize.getWidth()
+          doc.setFontSize(20); doc.setFont("helvetica", "bold")
+          doc.text("Sinza Classic Wear", pw / 2, 20, { align: "center" })
+          doc.setFontSize(14); doc.setFont("helvetica", "normal")
+          doc.text("Purchase Report", pw / 2, 28, { align: "center" })
+          doc.setFontSize(10)
+          doc.text(`Period: ${fromDate || "All time"} to ${toDate || "Today"}`, pw / 2, 35, { align: "center" })
+          doc.text(`Generated: ${new Date().toLocaleString()}`, pw / 2, 41, { align: "center" })
+          autoTable(doc, {
+            startY: 50,
+            head: [["Metric", "Value"]],
+            body: [
+              ["Total Purchases", formatTZS(data.totalPurchases || 0)],
+              ["Total Orders", String(data.totalOrders || 0)],
+              ["Outstanding Balance", formatTZS(data.outstandingBalance || 0)],
+            ],
+            theme: "striped",
+            headStyles: { fillColor: [99, 102, 241] },
+            margin: { left: 15, right: 15 },
+          })
+          if (data.bySupplier?.length) {
+            autoTable(doc, {
+              startY: (doc as any).lastAutoTable.finalY + 10,
+              head: [["Supplier", "Orders", "Total Amount", "Balance"]],
+              body: data.bySupplier.map((s: any) => [s.name, String(s.count), formatTZS(s.total), formatTZS(s.balance || 0)]),
+              theme: "striped",
+              headStyles: { fillColor: [99, 102, 241] },
+              margin: { left: 15, right: 15 },
+            })
+          }
+          doc.save(`Purchase_Report_${new Date().toISOString().split("T")[0]}.pdf`)
+        }}><HugeiconsIcon icon={Download04Icon} strokeWidth={2} className="size-4" /> Export PDF</Button>
       </div>
 
       <Card>
-        <CardContent className="flex flex-wrap items-end gap-4 p-4">
+        <CardContent className="flex flex-wrap items-end gap-3 p-4 sm:gap-4">
           <div className="space-y-1">
             <Label className="text-xs">From Date</Label>
-            <Input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="h-9 w-40" />
+            <Input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="h-9 w-full sm:w-40" />
           </div>
           <div className="space-y-1">
             <Label className="text-xs">To Date</Label>
-            <Input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="h-9 w-40" />
+            <Input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="h-9 w-full sm:w-40" />
           </div>
         </CardContent>
       </Card>
@@ -88,30 +125,45 @@ export default function PurchaseReportPage() {
           <CardTitle>Purchases by Supplier</CardTitle>
           <CardDescription>Top suppliers by purchase volume</CardDescription>
         </CardHeader>
-        <CardContent className="p-0">
+        <CardContent>
           {loading ? (
-            <div className="space-y-3 p-6">{[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-12 w-full" />)}</div>
+            <Skeleton className="h-64 w-full" />
           ) : data?.bySupplier?.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Supplier</TableHead>
-                  <TableHead>Orders</TableHead>
-                  <TableHead>Total Amount</TableHead>
-                  <TableHead>Balance</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data.bySupplier.map((s: any) => (
-                  <TableRow key={s.supplierId}>
-                    <TableCell className="font-medium">{s.name}</TableCell>
-                    <TableCell>{s.count}</TableCell>
-                    <TableCell className="font-medium">{formatTZS(s.total)}</TableCell>
-                    <TableCell className="text-destructive">{formatTZS(s.balance || 0)}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <div className="space-y-4">
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={data.bySupplier.map((s: any) => ({ name: s.name, Total: s.total, Balance: s.balance || 0 }))} layout="vertical">
+                    <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                    <XAxis type="number" tick={{ fontSize: 11 }} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
+                    <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={100} />
+                    <Tooltip formatter={(v: any) => formatTZS(Number(v) || 0)} />
+                    <Bar dataKey="Total" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Supplier</TableHead>
+                      <TableHead>Orders</TableHead>
+                      <TableHead>Total Amount</TableHead>
+                      <TableHead>Balance</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {data.bySupplier.map((s: any) => (
+                      <TableRow key={s.supplierId}>
+                        <TableCell className="font-medium">{s.name}</TableCell>
+                        <TableCell>{s.count}</TableCell>
+                        <TableCell className="font-medium">{formatTZS(s.total)}</TableCell>
+                        <TableCell className="text-destructive">{formatTZS(s.balance || 0)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
           ) : (
             <div className="p-6 text-center text-sm text-muted-foreground">No purchase data available</div>
           )}

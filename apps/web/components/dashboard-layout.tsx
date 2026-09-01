@@ -37,8 +37,9 @@ import {
   Logout01Icon,
   Settings05Icon,
 } from "@hugeicons/core-free-icons"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { api, getUser, clearAuth } from "@/lib/api"
 
 interface DashboardLayoutProps {
@@ -52,6 +53,40 @@ export function DashboardLayout({ children, breadcrumbs }: DashboardLayoutProps)
   const [branches, setBranches] = useState<{ id: string; name: string }[]>([])
   const [selectedBranch, setSelectedBranch] = useState<string>("all")
   const [notifications, setNotifications] = useState<{ id: string; title: string; message: string; isRead: boolean }[]>([])
+  const [searchQuery, setSearchQuery] = useState("")
+  const [searchResults, setSearchResults] = useState<{ products: any[]; customers: any[] }>({ products: [], customers: [] })
+  const [searchLoading, setSearchLoading] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const searchRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!searchQuery.trim()) { setSearchResults({ products: [], customers: [] }); return }
+    setSearchLoading(true)
+    const timer = setTimeout(async () => {
+      try {
+        const [prodRes, custRes] = await Promise.all([
+          api.get(`/products?search=${encodeURIComponent(searchQuery)}`),
+          api.get(`/customers?search=${encodeURIComponent(searchQuery)}`),
+        ])
+        setSearchResults({
+          products: prodRes.success ? (prodRes.data.products || []).slice(0, 4) : [],
+          customers: custRes.success ? (custRes.data.customers || []).slice(0, 4) : [],
+        })
+      } catch { setSearchResults({ products: [], customers: [] }) }
+      finally { setSearchLoading(false) }
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [searchQuery])
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setSearchOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
 
   useEffect(() => {
     const u = getUser()
@@ -80,7 +115,7 @@ export function DashboardLayout({ children, breadcrumbs }: DashboardLayoutProps)
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-3 sm:px-4">
           <SidebarTrigger className="-ms-1" />
           <Separator orientation="vertical" className="me-2 data-vertical:h-4 data-vertical:self-auto" />
           <Breadcrumb>
@@ -88,7 +123,7 @@ export function DashboardLayout({ children, breadcrumbs }: DashboardLayoutProps)
               {breadcrumbs.map((crumb, i) => (
                 <div key={i} className="flex items-center gap-2">
                   {i > 0 && <BreadcrumbSeparator className="hidden md:block" />}
-                  <BreadcrumbItem className="hidden md:block">
+                  <BreadcrumbItem className={i === 0 ? "block" : "hidden md:block"}>
                     {crumb.href ? (
                       <BreadcrumbLink href={crumb.href}>{crumb.label}</BreadcrumbLink>
                     ) : (
@@ -100,15 +135,53 @@ export function DashboardLayout({ children, breadcrumbs }: DashboardLayoutProps)
             </BreadcrumbList>
           </Breadcrumb>
 
-          <div className="ml-auto flex items-center gap-2">
-            <div className="relative hidden md:block">
+          <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
+            <div ref={searchRef} className="relative hidden lg:block">
               <HugeiconsIcon icon={Search01Icon} strokeWidth={2} className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input placeholder="Search..." className="h-9 w-48 pl-8 lg:w-64" />
+              <Input placeholder="Search products, customers..." className="h-9 w-48 pl-8 lg:w-64" value={searchQuery} onChange={(e) => { setSearchQuery(e.target.value); setSearchOpen(true) }} onFocus={() => setSearchOpen(true)} />
+              {searchOpen && searchQuery.trim() && (
+                <div className="absolute top-full mt-1 w-80 rounded-md border bg-popover shadow-md z-50 max-h-96 overflow-y-auto">
+                  {searchLoading ? (
+                    <div className="p-4 text-center text-sm text-muted-foreground">Searching...</div>
+                  ) : searchResults.products.length === 0 && searchResults.customers.length === 0 ? (
+                    <div className="p-4 text-center text-sm text-muted-foreground">No results found</div>
+                  ) : (
+                    <>
+                      {searchResults.products.length > 0 && (
+                        <div className="p-2">
+                          <div className="px-2 py-1 text-xs font-medium text-muted-foreground">Products</div>
+                          {searchResults.products.map((p) => (
+                            <Link key={p.id} href={`/dashboard/products/${p.id}`} onClick={() => { setSearchOpen(false); setSearchQuery("") }}>
+                              <div className="flex items-center gap-2 rounded px-2 py-1.5 text-sm hover:bg-muted cursor-pointer">
+                                <span className="font-medium">{p.name}</span>
+                                {p.category?.name && <span className="text-xs text-muted-foreground">{p.category.name}</span>}
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                      {searchResults.customers.length > 0 && (
+                        <div className="p-2 border-t">
+                          <div className="px-2 py-1 text-xs font-medium text-muted-foreground">Customers</div>
+                          {searchResults.customers.map((c) => (
+                            <Link key={c.id} href={`/dashboard/customers/${c.id}`} onClick={() => { setSearchOpen(false); setSearchQuery("") }}>
+                              <div className="flex items-center gap-2 rounded px-2 py-1.5 text-sm hover:bg-muted cursor-pointer">
+                                <span className="font-medium">{c.name}</span>
+                                {c.phone && <span className="text-xs text-muted-foreground">{c.phone}</span>}
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              )}
             </div>
 
             <DropdownMenu>
               <DropdownMenuTrigger render={<Button variant="outline" size="sm" className="gap-2" />}>
-                  <HugeiconsIcon icon={Store02Icon} strokeWidth={2} className="size-4" />
+                  <HugeiconsIcon icon={Store02Icon} strokeWidth={2} className="size-4 shrink-0" />
                   <span className="hidden sm:inline">
                     {selectedBranch === "all" ? "All Branches" : branches.find((b) => b.id === selectedBranch)?.name || "Branch"}
                   </span>
@@ -178,7 +251,7 @@ export function DashboardLayout({ children, breadcrumbs }: DashboardLayoutProps)
             </DropdownMenu>
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+        <div className="flex flex-1 flex-col gap-3 p-3 pt-0 sm:gap-4 sm:p-4 sm:pt-0">
           {children}
         </div>
       </SidebarInset>

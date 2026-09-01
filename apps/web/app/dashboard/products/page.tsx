@@ -12,6 +12,9 @@ import { HugeiconsIcon } from "@hugeicons/react"
 import { Shirt01Icon, PlusIcon, Search01Icon, Package02Icon, Upload01Icon, Download01Icon } from "@hugeicons/core-free-icons"
 import { api, formatTZS } from "@/lib/api"
 import type { Product, Category, Brand } from "@/lib/types"
+import { toast } from "sonner"
+import jsPDF from "jspdf"
+import autoTable from "jspdf-autotable"
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
@@ -49,33 +52,110 @@ export default function ProductsPage() {
     return matchSearch && matchCat && matchBrand
   })
 
+  function exportProducts() {
+    if (filtered.length === 0) { toast.error("No products to export"); return }
+    const headers = ["Name", "Category", "Brand", "Status", "Variants", "Min Price", "Max Price"]
+    const rows = filtered.map((p) => [
+      p.name,
+      p.category?.name || "",
+      p.brand?.name || "",
+      p.status,
+      String(p.variants?.length || 0),
+      p.variants?.length ? formatTZS(Math.min(...p.variants.map((v) => v.sellingPrice))) : "",
+      p.variants?.length ? formatTZS(Math.max(...p.variants.map((v) => v.sellingPrice))) : "",
+    ])
+    const csv = [headers, ...rows].map((r) => r.map((c) => `"${c}"`).join(",")).join("\n")
+    const blob = new Blob([csv], { type: "text/csv" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url; a.download = `Products_${new Date().toISOString().split("T")[0]}.csv`; a.click()
+    URL.revokeObjectURL(url)
+    toast.success(`Exported ${filtered.length} products to CSV`)
+  }
+
+  function exportProductsPDF() {
+    if (filtered.length === 0) { toast.error("No products to export"); return }
+    const doc = new jsPDF()
+    const pw = doc.internal.pageSize.getWidth()
+    doc.setFontSize(20); doc.setFont("helvetica", "bold")
+    doc.text("Sinza Classic Wear", pw / 2, 20, { align: "center" })
+    doc.setFontSize(14); doc.setFont("helvetica", "normal")
+    doc.text("Product Catalog Report", pw / 2, 28, { align: "center" })
+    doc.setFontSize(10)
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, pw / 2, 35, { align: "center" })
+    autoTable(doc, {
+      startY: 45,
+      head: [["Product", "Category", "Variants", "Price Range", "Status"]],
+      body: filtered.map((p) => [
+        p.name,
+        p.category?.name || "—",
+        String(p.variants?.length || 0),
+        p.variants?.length ? `${formatTZS(Math.min(...p.variants.map((v) => v.sellingPrice)))} - ${formatTZS(Math.max(...p.variants.map((v) => v.sellingPrice)))}` : "—",
+        p.status,
+      ]),
+      theme: "striped",
+      headStyles: { fillColor: [99, 102, 241] },
+      margin: { left: 15, right: 15 },
+    })
+    doc.save(`Products_Report_${new Date().toISOString().split("T")[0]}.pdf`)
+  }
+
+  async function importProducts(file: File) {
+    const text = await file.text()
+    const lines = text.split("\n").filter((l) => l.trim())
+    if (lines.length < 2) { toast.error("CSV file is empty or invalid"); return }
+    const headers = lines[0]?.split(",").map((h) => h.replace(/"/g, "").trim()) || []
+    let success = 0, failed = 0
+    for (let i = 1; i < lines.length; i++) {
+      const values = lines[i]?.split(",").map((v) => v.replace(/"/g, "").trim()) || []
+      const name = values[headers.indexOf("Name")] || values[0] || ""
+      if (!name) { failed++; continue }
+      try {
+        const res = await api.post("/products", { name })
+        if (res.success) success++; else failed++
+      } catch { failed++ }
+    }
+    toast.success(`Imported ${success} products${failed > 0 ? `, ${failed} failed` : ""}`)
+    if (success > 0) {
+      const refresh = await api.get("/products")
+      if (refresh.success) setProducts(refresh.data.products || [])
+    }
+  }
+
   return (
     <DashboardLayout breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Products" }]}>
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Products</h1>
           <p className="text-sm text-muted-foreground">Manage your product catalog and variants</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline"><HugeiconsIcon icon={Upload01Icon} strokeWidth={2} className="size-4" /> Import</Button>
-          <Button variant="outline"><HugeiconsIcon icon={Download01Icon} strokeWidth={2} className="size-4" /> Export</Button>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" className="hidden sm:flex" onClick={exportProducts}><HugeiconsIcon icon={Download01Icon} strokeWidth={2} className="size-4" /> Export</Button>
+          <Button variant="outline" className="hidden sm:flex" onClick={() => {
+            const input = document.createElement("input")
+            input.type = "file"; input.accept = ".csv"
+            input.onchange = (e) => { const f = (e.target as HTMLInputElement).files?.[0]; if (f) importProducts(f) }
+            input.click()
+          }}><HugeiconsIcon icon={Upload01Icon} strokeWidth={2} className="size-4" /> Import</Button>
           <Link href="/dashboard/products/new"><Button><HugeiconsIcon icon={PlusIcon} strokeWidth={2} className="size-4" /> Add Product</Button></Link>
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
         <div className="relative flex-1 min-w-48">
           <HugeiconsIcon icon={Search01Icon} strokeWidth={2} className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input placeholder="Search products by name or SKU..." value={search} onChange={(e) => setSearch(e.target.value)} className="ps-9" />
         </div>
-        <select className="h-9 rounded-md border bg-background px-3 text-sm" value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
-          <option value="all">All Categories</option>
-          {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-        </select>
-        <select className="h-9 rounded-md border bg-background px-3 text-sm" value={brandFilter} onChange={(e) => setBrandFilter(e.target.value)}>
-          <option value="all">All Brands</option>
-          {brands.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
-        </select>
+        <div className="flex gap-2">
+          <select className="h-9 flex-1 rounded-md border bg-background px-3 text-sm sm:flex-none" value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
+            <option value="all">All Categories</option>
+            {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
+          <select className="h-9 flex-1 rounded-md border bg-background px-3 text-sm sm:flex-none" value={brandFilter} onChange={(e) => setBrandFilter(e.target.value)}>
+            <option value="all">All Brands</option>
+            {brands.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+          </select>
+        </div>
       </div>
 
       {loading ? (

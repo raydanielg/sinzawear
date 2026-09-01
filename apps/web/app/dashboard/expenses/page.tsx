@@ -9,12 +9,18 @@ import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import { Skeleton } from "@workspace/ui/components/skeleton"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@workspace/ui/components/table"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@workspace/ui/components/dialog"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@workspace/ui/components/sheet"
 import { toast } from "sonner"
 import { HugeiconsIcon } from "@hugeicons/react"
-import { PlusIcon, CoinsIcon, Search01Icon } from "@hugeicons/core-free-icons"
+import { PlusIcon, CoinsIcon, Search01Icon, TrashIcon } from "@hugeicons/core-free-icons"
 import { api, formatTZS, formatDate } from "@/lib/api"
 import type { Expense, Branch } from "@/lib/types"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@workspace/ui/components/dropdown-menu"
 
 export default function ExpensesPage() {
   const [expenses, setExpenses] = useState<Expense[]>([])
@@ -77,9 +83,24 @@ export default function ExpensesPage() {
     }
   }
 
+  async function handleDelete(expense: Expense) {
+    if (!confirm("Delete this expense? This cannot be undone.")) return
+    try {
+      const res = await api.delete(`/expenses/${expense.id}`)
+      if (res.success) {
+        toast.success("Expense deleted")
+        setExpenses((prev) => prev.filter((e) => e.id !== expense.id))
+      } else {
+        toast.error(res.message || "Failed to delete expense")
+      }
+    } catch {
+      toast.error("Failed to delete expense")
+    }
+  }
+
   return (
     <DashboardLayout breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Finance", href: "/dashboard/expenses" }, { label: "Expenses" }]}>
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Expenses</h1>
           <p className="text-sm text-muted-foreground">Track all branch expenses</p>
@@ -124,9 +145,9 @@ export default function ExpensesPage() {
               <CardTitle>Expense History</CardTitle>
               <CardDescription>All recorded expenses across branches</CardDescription>
             </div>
-            <div className="relative">
+            <div className="relative w-full sm:w-48">
               <HugeiconsIcon icon={Search01Icon} strokeWidth={2} className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} className="h-9 w-48 pl-8" />
+              <Input placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} className="h-9 w-full pl-8" />
             </div>
           </div>
         </CardHeader>
@@ -144,6 +165,7 @@ export default function ExpensesPage() {
               </div>
             </div>
           ) : (
+            <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -153,6 +175,7 @@ export default function ExpensesPage() {
                   <TableHead>Amount</TableHead>
                   <TableHead>Recorded By</TableHead>
                   <TableHead>Date</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -164,17 +187,30 @@ export default function ExpensesPage() {
                     <TableCell className="font-medium text-destructive">{formatTZS(e.amount)}</TableCell>
                     <TableCell className="text-muted-foreground">{e.user?.name || "—"}</TableCell>
                     <TableCell className="text-muted-foreground">{formatDate(e.date)}</TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger render={<Button size="sm" variant="ghost" className="h-8 w-8 p-0" />}>
+                          <HugeiconsIcon icon={TrashIcon} strokeWidth={2} className="size-4" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(e)}>
+                            <HugeiconsIcon icon={TrashIcon} strokeWidth={2} className="size-4" /> Delete Expense
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
+            </div>
           )}
         </CardContent>
       </Card>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Add Expense</DialogTitle></DialogHeader>
+      <Sheet open={dialogOpen} onOpenChange={setDialogOpen}>
+        <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+          <SheetHeader><SheetTitle>Add Expense</SheetTitle></SheetHeader>
           <form onSubmit={handleAdd} className="space-y-4">
             <div className="space-y-2">
               <Label>Amount (TZS) *</Label>
@@ -199,13 +235,15 @@ export default function ExpensesPage() {
               <Label>Date</Label>
               <Input type="date" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} />
             </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
-              <Button type="submit" disabled={saving}>{saving ? "Saving..." : "Add Expense"}</Button>
-            </DialogFooter>
+            <SheetFooter className="mt-auto pt-4">
+              <div className="flex flex-col gap-2">
+                <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
+                <Button type="submit" disabled={saving}>{saving ? "Saving..." : "Add Expense"}</Button>
+              </div>
+            </SheetFooter>
           </form>
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
     </DashboardLayout>
   )
 }

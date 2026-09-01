@@ -7,7 +7,7 @@ import { Badge } from "@workspace/ui/components/badge"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Skeleton } from "@workspace/ui/components/skeleton"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@workspace/ui/components/dialog"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@workspace/ui/components/sheet"
 import { ScrollArea } from "@workspace/ui/components/scroll-area"
 import { toast } from "sonner"
 import { HugeiconsIcon } from "@hugeicons/react"
@@ -138,7 +138,7 @@ export default function POSPage() {
 
   return (
     <DashboardLayout breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Sales", href: "/dashboard/pos" }, { label: "POS" }]}>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Point of Sale</h1>
           <p className="text-sm text-muted-foreground">Search products, add to cart, and complete sales</p>
@@ -146,13 +146,20 @@ export default function POSPage() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2 space-y-4 order-2 lg:order-1">
           <div className="flex gap-2">
             <div className="relative flex-1">
               <HugeiconsIcon icon={Search01Icon} strokeWidth={2} className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               <Input placeholder="Search product by name, SKU, barcode..." value={search} onChange={(e) => setSearch(e.target.value)} className="ps-9" />
             </div>
-            <Button variant="outline" size="icon" className="shrink-0">
+            <Button variant="outline" size="icon" className="shrink-0" title="Scan barcode" onClick={() => {
+              const input = prompt("Enter or scan barcode:")
+              if (input) {
+                const match = allVariants.find((v) => v.barcode === input || v.sku.toLowerCase() === input.toLowerCase())
+                if (match) addToCart(match)
+                else toast.error("No product found for that barcode")
+              }
+            }}>
               <HugeiconsIcon icon={BarcodeIcon} strokeWidth={2} className="size-5" />
             </Button>
           </div>
@@ -195,7 +202,7 @@ export default function POSPage() {
           )}
         </div>
 
-        <Card className="lg:sticky lg:top-4 h-fit">
+        <Card className="lg:sticky lg:top-4 h-fit order-1 lg:order-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <HugeiconsIcon icon={ShoppingCart01Icon} strokeWidth={2} className="size-5" />
@@ -265,11 +272,11 @@ export default function POSPage() {
         </Card>
       </div>
 
-      <Dialog open={checkoutOpen} onOpenChange={setCheckoutOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Checkout</DialogTitle>
-          </DialogHeader>
+      <Sheet open={checkoutOpen} onOpenChange={setCheckoutOpen}>
+        <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Checkout</SheetTitle>
+          </SheetHeader>
           <div className="space-y-4">
             <div className="rounded-lg bg-primary/10 p-4 text-center">
               <p className="text-sm text-muted-foreground">Total Amount</p>
@@ -298,14 +305,16 @@ export default function POSPage() {
               </>
             )}
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setCheckoutOpen(false)}>Cancel</Button>
-            <Button onClick={completeSale} disabled={processing || (paymentMethod === "cash" && amountReceived < total)}>
-              {processing ? "Processing..." : "Complete Payment"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          <SheetFooter className="mt-auto pt-4">
+            <div className="flex flex-col gap-2">
+              <Button variant="outline" onClick={() => setCheckoutOpen(false)}>Cancel</Button>
+              <Button onClick={completeSale} disabled={processing || (paymentMethod === "cash" && amountReceived < total)}>
+                {processing ? "Processing..." : "Complete Payment"}
+              </Button>
+            </div>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
     </DashboardLayout>
   )
 }
