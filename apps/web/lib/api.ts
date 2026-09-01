@@ -1,5 +1,5 @@
 export const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1"
+  process.env.NEXT_PUBLIC_API_URL || "http://178.104.240.146:4001/api/v1"
 
 export function getToken() {
   if (typeof window === "undefined") return null
