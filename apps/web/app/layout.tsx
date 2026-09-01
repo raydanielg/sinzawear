@@ -1,8 +1,19 @@
 import { Geist, Geist_Mono, Nunito_Sans } from "next/font/google"
+import type { Metadata } from "next"
 
 import "@workspace/ui/globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@workspace/ui/lib/utils";
+
+export const metadata: Metadata = {
+  title: "Sinza Classic Wear",
+  description: "Classic style, timeless elegance. Premium fashion for the modern individual.",
+  icons: {
+    icon: "/assets/m app2.png",
+    shortcut: "/assets/m app2.png",
+    apple: "/assets/m app2.png",
+  },
+}
 
 const nunitoSans = Nunito_Sans({subsets:['latin'],variable:'--font-sans'})
 
