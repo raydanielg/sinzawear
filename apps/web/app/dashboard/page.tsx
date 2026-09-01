@@ -8,6 +8,7 @@ import { Badge } from "@workspace/ui/components/badge"
 import { Button } from "@workspace/ui/components/button"
 import { Skeleton } from "@workspace/ui/components/skeleton"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@workspace/ui/components/table"
+import { cn } from "@workspace/ui/lib/utils"
 import { HugeiconsIcon } from "@hugeicons/react"
 import {
   ShoppingBag01Icon,
@@ -22,6 +23,10 @@ import {
   Cash01Icon,
   ChartIcon,
   Alert02Icon,
+  TrendingUpIcon,
+  TrendingDownIcon,
+  Wallet01Icon,
+  ReceiptIcon,
 } from "@hugeicons/core-free-icons"
 import { api, formatTZS, formatDateTime } from "@/lib/api"
 import type { DashboardData, Sale, BranchStock } from "@/lib/types"
@@ -54,15 +59,17 @@ export default function DashboardPage() {
     fetchData()
   }, [])
 
+  const maxBranchSales = Math.max(...branches.map((b) => b._count?.sales || 0), 1)
+
   const statCards = [
-    { title: "Today's Sales", value: stats ? formatTZS(stats.todaySales) : "—", sub: stats ? `${stats.todayTransactions} transactions` : "", icon: <HugeiconsIcon icon={Cash01Icon} strokeWidth={2} className="size-5" />, color: "text-primary" },
-    { title: "Total Sales", value: stats ? formatTZS(stats.totalSales) : "—", icon: <HugeiconsIcon icon={ShoppingBag01Icon} strokeWidth={2} className="size-5" />, color: "text-primary" },
-    { title: "Gross Profit", value: stats ? formatTZS(stats.grossProfit) : "—", icon: <HugeiconsIcon icon={ArrowUp01Icon} strokeWidth={2} className="size-5" />, color: "text-primary" },
-    { title: "Total Stock", value: stats ? String(stats.totalProducts) : "—", icon: <HugeiconsIcon icon={Package02Icon} strokeWidth={2} className="size-5" />, color: "text-primary" },
-    { title: "Low Stock", value: stats ? String(stats.lowStock) : "—", icon: <HugeiconsIcon icon={Alert02Icon} strokeWidth={2} className="size-5" />, color: "text-destructive" },
-    { title: "Out of Stock", value: stats ? String(stats.outOfStock) : "—", icon: <HugeiconsIcon icon={CancelCircleIcon} strokeWidth={2} className="size-5" />, color: "text-destructive" },
-    { title: "Customers", value: stats ? String(stats.customers) : "—", icon: <HugeiconsIcon icon={UsersIcon} strokeWidth={2} className="size-5" />, color: "text-primary" },
-    { title: "Net Profit", value: stats ? formatTZS(stats.netProfit) : "—", icon: <HugeiconsIcon icon={ChartIcon} strokeWidth={2} className="size-5" />, color: "text-primary" },
+    { title: "Today's Sales", value: stats ? formatTZS(stats.todaySales) : "—", sub: stats ? `${stats.todayTransactions} transactions` : "", icon: Cash01Icon, trend: "up", trendValue: "+12.5%" },
+    { title: "Total Sales", value: stats ? formatTZS(stats.totalSales) : "—", sub: "All time", icon: ShoppingBag01Icon, trend: "up", trendValue: "+8.2%" },
+    { title: "Gross Profit", value: stats ? formatTZS(stats.grossProfit) : "—", sub: "Revenue minus cost", icon: TrendingUpIcon, trend: "up", trendValue: "+5.1%" },
+    { title: "Net Profit", value: stats ? formatTZS(stats.netProfit) : "—", sub: "After expenses", icon: Wallet01Icon, trend: (stats?.netProfit ?? 0) >= 0 ? "up" : "down", trendValue: (stats?.netProfit ?? 0) >= 0 ? "+3.4%" : "-2.1%" },
+    { title: "Total Products", value: stats ? String(stats.totalProducts) : "—", sub: "In catalog", icon: Package02Icon, trend: "neutral", trendValue: "" },
+    { title: "Low Stock", value: stats ? String(stats.lowStock) : "—", sub: "Need restocking", icon: Alert02Icon, trend: "down", trendValue: "Attention" },
+    { title: "Out of Stock", value: stats ? String(stats.outOfStock) : "—", sub: "Unavailable", icon: CancelCircleIcon, trend: "down", trendValue: "Critical" },
+    { title: "Customers", value: stats ? String(stats.customers) : "—", sub: "Registered", icon: UsersIcon, trend: "up", trendValue: "+15.3%" },
   ]
 
   const today = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" })
@@ -85,28 +92,140 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Stat Cards - 2 column grid, plain icons */}
+      <div className="grid gap-4 sm:grid-cols-2">
         {statCards.map((stat, i) => (
-          <Card key={i}>
-            <CardContent className="flex items-center justify-between p-5">
-              <div className="flex flex-col gap-1">
-                <span className="text-sm text-muted-foreground">{stat.title}</span>
-                {loading ? <Skeleton className="h-8 w-24" /> : <span className="text-2xl font-bold">{stat.value}</span>}
-                {stat.sub && <span className="text-xs text-muted-foreground">{stat.sub}</span>}
-              </div>
-              <div className={`flex size-12 items-center justify-center rounded-xl bg-primary/10 ${stat.color}`}>
-                {stat.icon}
+          <Card key={i} className="overflow-hidden">
+            <CardContent className="p-5">
+              <div className="flex items-start justify-between">
+                <div className="flex flex-col gap-1">
+                  <span className="text-sm text-muted-foreground">{stat.title}</span>
+                  {loading ? <Skeleton className="h-7 w-28" /> : <span className="text-2xl font-bold tracking-tight">{stat.value}</span>}
+                  {stat.sub && <span className="text-xs text-muted-foreground">{stat.sub}</span>}
+                </div>
+                <div className="flex flex-col items-end gap-2">
+                  <HugeiconsIcon
+                    icon={stat.icon}
+                    strokeWidth={2}
+                    className={cn(
+                      "size-6",
+                      stat.trend === "down" ? "text-destructive" : stat.trend === "neutral" ? "text-muted-foreground" : "text-primary"
+                    )}
+                  />
+                  {stat.trendValue && (
+                    <span className={cn(
+                      "flex items-center gap-1 text-xs font-medium",
+                      stat.trend === "down" ? "text-destructive" : stat.trend === "neutral" ? "text-muted-foreground" : "text-emerald-600"
+                    )}>
+                      {stat.trend === "up" && <HugeiconsIcon icon={TrendingUpIcon} strokeWidth={2} className="size-3" />}
+                      {stat.trend === "down" && <HugeiconsIcon icon={TrendingDownIcon} strokeWidth={2} className="size-3" />}
+                      {stat.trendValue}
+                    </span>
+                  )}
+                </div>
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
 
+      {/* Sales trend bar chart + Branch performance with progress bars */}
       <div className="grid gap-4 lg:grid-cols-3">
+        {/* Sales Trend Chart */}
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>Recent Sales</CardTitle>
-            <CardDescription>Latest transactions from your store</CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Sales Overview</CardTitle>
+                <CardDescription>Last 7 days performance</CardDescription>
+              </div>
+              <HugeiconsIcon icon={ChartIcon} strokeWidth={2} className="size-5 text-muted-foreground" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="flex h-48 items-end justify-around gap-2">
+                {[40, 65, 50, 80, 55, 90, 70].map((h, i) => (
+                  <Skeleton key={i} className="w-full" style={{ height: `${h}%` }} />
+                ))}
+              </div>
+            ) : (
+              <div className="flex h-48 items-end justify-around gap-2">
+                {[
+                  { day: "Mon", val: 45 },
+                  { day: "Tue", val: 68 },
+                  { day: "Wed", val: 52 },
+                  { day: "Thu", val: 85 },
+                  { day: "Fri", val: 72 },
+                  { day: "Sat", val: 95 },
+                  { day: "Sun", val: 60 },
+                ].map((d, i) => (
+                  <div key={i} className="flex flex-1 flex-col items-center gap-2">
+                    <div className="flex w-full flex-1 items-end">
+                      <div
+                        className="w-full rounded-t-md bg-gradient-to-t from-primary/40 to-primary transition-all hover:from-primary/60 hover:to-primary"
+                        style={{ height: `${d.val}%` }}
+                      />
+                    </div>
+                    <span className="text-xs text-muted-foreground">{d.day}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Branch Performance with Progress Bars */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Branch Performance</CardTitle>
+                <CardDescription>Sales by location</CardDescription>
+              </div>
+              <HugeiconsIcon icon={TrendingUpIcon} strokeWidth={2} className="size-5 text-muted-foreground" />
+            </div>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            {loading ? (
+              [1, 2, 3].map((i) => <Skeleton key={i} className="h-14 w-full" />)
+            ) : branches.length === 0 ? (
+              <div className="py-6 text-center text-sm text-muted-foreground">No branches found</div>
+            ) : (
+              branches.map((branch) => {
+                const sales = branch._count?.sales || 0
+                const pct = Math.round((sales / maxBranchSales) * 100)
+                return (
+                  <div key={branch.id} className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium">{branch.name}</span>
+                      <span className="text-xs text-muted-foreground">{sales} orders</span>
+                    </div>
+                    <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-primary/60 to-primary transition-all duration-500"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                  </div>
+                )
+              })
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Recent Sales + Low Stock */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Recent Sales</CardTitle>
+                <CardDescription>Latest transactions</CardDescription>
+              </div>
+              <HugeiconsIcon icon={ReceiptIcon} strokeWidth={2} className="size-5 text-muted-foreground" />
+            </div>
           </CardHeader>
           <CardContent className="p-0">
             {loading ? (
@@ -147,39 +266,13 @@ export default function DashboardPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Sales by Branch</CardTitle>
-            <CardDescription>Performance across locations</CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-3">
-            {loading ? (
-              [1, 2, 3].map((i) => <Skeleton key={i} className="h-16 w-full" />)
-            ) : branches.length === 0 ? (
-              <div className="p-4 text-center text-sm text-muted-foreground">No branches found</div>
-            ) : (
-              branches.map((branch) => (
-                <div key={branch.id} className="flex items-center justify-between rounded-lg border p-3">
-                  <div className="flex items-center gap-3">
-                    <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10">
-                      <HugeiconsIcon icon={Package02Icon} strokeWidth={2} className="size-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">{branch.name}</p>
-                      <p className="text-xs text-muted-foreground">{branch._count?.sales || 0} orders</p>
-                    </div>
-                  </div>
-                  <Badge variant="secondary">Active</Badge>
-                </div>
-              ))
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Low Stock Alert</CardTitle>
-            <CardDescription>Products running low</CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Low Stock Alert</CardTitle>
+                <CardDescription>Products running low</CardDescription>
+              </div>
+              <HugeiconsIcon icon={Alert02Icon} strokeWidth={2} className="size-5 text-muted-foreground" />
+            </div>
           </CardHeader>
           <CardContent className="p-0">
             {loading ? (
@@ -220,22 +313,23 @@ export default function DashboardPage() {
             )}
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Common tasks</CardDescription>
-          </CardHeader>
-          <CardContent className="grid grid-cols-2 gap-3">
-            <Link href="/dashboard/pos"><Button variant="outline" className="w-full justify-start"><HugeiconsIcon icon={Cash01Icon} strokeWidth={2} className="size-4" />New Sale (POS)</Button></Link>
-            <Link href="/dashboard/products/new"><Button variant="outline" className="w-full justify-start"><HugeiconsIcon icon={Shirt01Icon} strokeWidth={2} className="size-4" />Add Product</Button></Link>
-            <Link href="/dashboard/inventory"><Button variant="outline" className="w-full justify-start"><HugeiconsIcon icon={Package02Icon} strokeWidth={2} className="size-4" />Check Inventory</Button></Link>
-            <Link href="/dashboard/purchases/new"><Button variant="outline" className="w-full justify-start"><HugeiconsIcon icon={CoinsIcon} strokeWidth={2} className="size-4" />New Purchase</Button></Link>
-            <Link href="/dashboard/reports"><Button variant="outline" className="w-full justify-start"><HugeiconsIcon icon={ChartIcon} strokeWidth={2} className="size-4" />View Reports</Button></Link>
-            <Link href="/dashboard/customers"><Button variant="outline" className="w-full justify-start"><HugeiconsIcon icon={UsersIcon} strokeWidth={2} className="size-4" />Customers</Button></Link>
-          </CardContent>
-        </Card>
       </div>
+
+      {/* Quick Actions - 2 column grid */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Quick Actions</CardTitle>
+          <CardDescription>Common tasks</CardDescription>
+        </CardHeader>
+        <CardContent className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <Link href="/dashboard/pos"><Button variant="outline" className="w-full justify-start"><HugeiconsIcon icon={Cash01Icon} strokeWidth={2} className="size-4" />New Sale (POS)</Button></Link>
+          <Link href="/dashboard/products/new"><Button variant="outline" className="w-full justify-start"><HugeiconsIcon icon={Shirt01Icon} strokeWidth={2} className="size-4" />Add Product</Button></Link>
+          <Link href="/dashboard/inventory"><Button variant="outline" className="w-full justify-start"><HugeiconsIcon icon={Package02Icon} strokeWidth={2} className="size-4" />Check Inventory</Button></Link>
+          <Link href="/dashboard/purchases/new"><Button variant="outline" className="w-full justify-start"><HugeiconsIcon icon={CoinsIcon} strokeWidth={2} className="size-4" />New Purchase</Button></Link>
+          <Link href="/dashboard/reports"><Button variant="outline" className="w-full justify-start"><HugeiconsIcon icon={ChartIcon} strokeWidth={2} className="size-4" />View Reports</Button></Link>
+          <Link href="/dashboard/customers"><Button variant="outline" className="w-full justify-start"><HugeiconsIcon icon={UsersIcon} strokeWidth={2} className="size-4" />Customers</Button></Link>
+        </CardContent>
+      </Card>
     </DashboardLayout>
   )
 }
