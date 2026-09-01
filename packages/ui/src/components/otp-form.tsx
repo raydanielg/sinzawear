@@ -43,7 +43,7 @@ export function OtpForm({
 
     setIsLoading(true)
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1"}/auth/verify-otp`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://pictures-urge-effort-parking.trycloudflare.com/api/v1"}/auth/verify-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp: otpValue }),
