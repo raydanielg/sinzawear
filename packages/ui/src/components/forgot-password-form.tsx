@@ -29,7 +29,7 @@ export function ForgotPasswordForm({
 
     setIsLoading(true)
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://atlas-devon-cardiac-convicted.trycloudflare.com/api/v1"}/auth/forgot-password`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://178-104-240-146.sslip.io/api/v1"}/auth/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

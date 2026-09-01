@@ -1,5 +1,5 @@
 export const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://atlas-devon-cardiac-convicted.trycloudflare.com/api/v1"
+  process.env.NEXT_PUBLIC_API_URL || "https://178-104-240-146.sslip.io/api/v1"
 
 export function getToken() {
   if (typeof window === "undefined") return null
