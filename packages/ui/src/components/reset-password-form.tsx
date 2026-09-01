@@ -87,7 +87,7 @@ export function ResetPasswordForm({
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
                 <img
-                  src="/assets/m app2.png"
+                  src="/assets/social-media.png"
                   alt="Sinza Classic Wear"
                   className="size-16 object-contain"
                 />

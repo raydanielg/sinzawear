@@ -65,7 +65,7 @@ export function LoginForm({
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
                 <img
-                  src="/assets/m app2.png"
+                  src="/assets/social-media.png"
                   alt="Sinza Classic Wear"
                   className="size-16 object-contain"
                 />
@@ -93,15 +93,7 @@ export function LoginForm({
                 </div>
               </Field>
               <Field>
-                <div className="flex items-center">
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <a
-                    href="/auth/forgot-password"
-                    className="ms-auto text-sm underline-offset-2 hover:underline"
-                  >
-                    Forgot your password?
-                  </a>
-                </div>
+                <FieldLabel htmlFor="password">Password</FieldLabel>
                 <div className="relative">
                   <HugeiconsIcon
                     icon={LockPasswordIcon}
@@ -124,7 +116,7 @@ export function LoginForm({
                 </Button>
               </Field>
               <FieldDescription className="text-center">
-                Don&apos;t have an account? <a href="/auth/sign-up">Sign up</a>
+                Authorized personnel only. Contact admin for access.
               </FieldDescription>
             </FieldGroup>
           </form>

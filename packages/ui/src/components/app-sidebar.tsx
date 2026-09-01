@@ -14,159 +14,209 @@ import {
   SidebarRail,
 } from "@workspace/ui/components/sidebar"
 import { HugeiconsIcon } from "@hugeicons/react"
-import { LayoutBottomIcon, AudioWave01Icon, CommandIcon, ComputerTerminalIcon, RoboticIcon, BookOpen02Icon, Settings05Icon, CropIcon, PieChartIcon, MapsIcon } from "@hugeicons/core-free-icons"
+import {
+  DashboardSquare02Icon,
+  ShoppingBag01Icon,
+  Shirt01Icon,
+  UsersIcon,
+  ChartIcon,
+  Settings05Icon,
+  CoinsIcon,
+  CustomerService01Icon,
+  Store02Icon,
+  Package02Icon,
+  StarAwardIcon,
+  Image02Icon,
+  PackageReceiveIcon,
+  MapIcon,
+  File02Icon,
+  UserGroupIcon,
+  ArrowLeftRightIcon,
+  Cash01Icon,
+  PrinterIcon,
+} from "@hugeicons/core-free-icons"
 
-// This is sample data.
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   teams: [
     {
-      name: "Acme Inc",
+      name: "Sinza Fashion",
       logo: (
-        <HugeiconsIcon icon={LayoutBottomIcon} strokeWidth={2} />
+        <img
+          src="/assets/social-media.png"
+          alt="Sinza"
+          className="size-5 rounded-sm object-cover"
+        />
       ),
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: (
-        <HugeiconsIcon icon={AudioWave01Icon} strokeWidth={2} />
-      ),
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: (
-        <HugeiconsIcon icon={CommandIcon} strokeWidth={2} />
-      ),
-      plan: "Free",
+      plan: "Retail Management",
     },
   ],
   navMain: [
     {
-      title: "Playground",
-      url: "#",
+      title: "Dashboard",
+      url: "/dashboard",
       icon: (
-        <HugeiconsIcon icon={ComputerTerminalIcon} strokeWidth={2} />
+        <HugeiconsIcon icon={DashboardSquare02Icon} strokeWidth={2} />
       ),
       isActive: true,
       items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
+        { title: "Overview", url: "/dashboard" },
       ],
     },
     {
-      title: "Models",
-      url: "#",
+      title: "Sales",
+      url: "/dashboard/pos",
       icon: (
-        <HugeiconsIcon icon={RoboticIcon} strokeWidth={2} />
+        <HugeiconsIcon icon={Cash01Icon} strokeWidth={2} />
       ),
       items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
+        { title: "POS", url: "/dashboard/pos" },
+        { title: "Sales", url: "/dashboard/sales" },
+        { title: "Returns", url: "/dashboard/returns" },
       ],
     },
     {
-      title: "Documentation",
-      url: "#",
+      title: "Inventory",
+      url: "/dashboard/inventory",
       icon: (
-        <HugeiconsIcon icon={BookOpen02Icon} strokeWidth={2} />
+        <HugeiconsIcon icon={Package02Icon} strokeWidth={2} />
       ),
       items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
+        { title: "Products", url: "/dashboard/products" },
+        { title: "Stock", url: "/dashboard/inventory" },
+        { title: "Movements", url: "/dashboard/inventory/movements" },
+        { title: "Transfers", url: "/dashboard/inventory/transfers" },
+        { title: "Adjustments", url: "/dashboard/inventory/adjustments" },
+      ],
+    },
+    {
+      title: "Purchasing",
+      url: "/dashboard/purchases",
+      icon: (
+        <HugeiconsIcon icon={PackageReceiveIcon} strokeWidth={2} />
+      ),
+      items: [
+        { title: "Purchases", url: "/dashboard/purchases" },
+        { title: "Suppliers", url: "/dashboard/suppliers" },
+      ],
+    },
+    {
+      title: "Customers",
+      url: "/dashboard/customers",
+      icon: (
+        <HugeiconsIcon icon={UsersIcon} strokeWidth={2} />
+      ),
+      items: [
+        { title: "All Customers", url: "/dashboard/customers" },
+      ],
+    },
+    {
+      title: "Finance",
+      url: "/dashboard/expenses",
+      icon: (
+        <HugeiconsIcon icon={CoinsIcon} strokeWidth={2} />
+      ),
+      items: [
+        { title: "Expenses", url: "/dashboard/expenses" },
+        { title: "Cash Register", url: "/dashboard/cash-register" },
+      ],
+    },
+    {
+      title: "Reports",
+      url: "/dashboard/reports",
+      icon: (
+        <HugeiconsIcon icon={ChartIcon} strokeWidth={2} />
+      ),
+      items: [
+        { title: "Overview", url: "/dashboard/reports" },
+        { title: "Sales Report", url: "/dashboard/reports/sales" },
+        { title: "Profit Report", url: "/dashboard/reports/profit" },
+        { title: "Inventory Report", url: "/dashboard/reports/inventory" },
+        { title: "Purchases Report", url: "/dashboard/reports/purchases" },
+        { title: "Branches Report", url: "/dashboard/reports/branches" },
+      ],
+    },
+    {
+      title: "Management",
+      url: "/dashboard/branches",
+      icon: (
+        <HugeiconsIcon icon={UserGroupIcon} strokeWidth={2} />
+      ),
+      items: [
+        { title: "Branches", url: "/dashboard/branches" },
+        { title: "Users", url: "/dashboard/users" },
+        { title: "Roles & Permissions", url: "/dashboard/settings/roles" },
+      ],
+    },
+    {
+      title: "Audit Logs",
+      url: "/dashboard/audit-logs",
+      icon: (
+        <HugeiconsIcon icon={File02Icon} strokeWidth={2} />
+      ),
+      items: [
+        { title: "Activity Log", url: "/dashboard/audit-logs" },
       ],
     },
     {
       title: "Settings",
-      url: "#",
+      url: "/dashboard/settings",
       icon: (
         <HugeiconsIcon icon={Settings05Icon} strokeWidth={2} />
       ),
       items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
+        { title: "Business", url: "/dashboard/settings" },
+        { title: "Roles", url: "/dashboard/settings/roles" },
       ],
     },
   ],
   projects: [
     {
-      name: "Design Engineering",
-      url: "#",
+      name: "New Sale",
+      url: "/dashboard/pos",
       icon: (
-        <HugeiconsIcon icon={CropIcon} strokeWidth={2} />
+        <HugeiconsIcon icon={Cash01Icon} strokeWidth={2} />
       ),
     },
     {
-      name: "Sales & Marketing",
-      url: "#",
+      name: "Add Product",
+      url: "/dashboard/products/new",
       icon: (
-        <HugeiconsIcon icon={PieChartIcon} strokeWidth={2} />
+        <HugeiconsIcon icon={Shirt01Icon} strokeWidth={2} />
       ),
     },
     {
-      name: "Travel",
-      url: "#",
+      name: "New Purchase",
+      url: "/dashboard/purchases/new",
       icon: (
-        <HugeiconsIcon icon={MapsIcon} strokeWidth={2} />
+        <HugeiconsIcon icon={PackageReceiveIcon} strokeWidth={2} />
       ),
     },
   ],
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const [user, setUser] = React.useState({
+    name: "User",
+    email: "user@sinza.co.tz",
+    avatar: "",
+  })
+
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("user")
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored)
+          setUser({
+            name: parsed.name || "User",
+            email: parsed.email || "",
+            avatar: parsed.avatar || "",
+          })
+        } catch {}
+      }
+    }
+  }, [])
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -177,7 +227,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
