@@ -1,5 +1,5 @@
 export const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://pictures-urge-effort-parking.trycloudflare.com/api/v1"
+  process.env.NEXT_PUBLIC_API_URL || "https://atlas-devon-cardiac-convicted.trycloudflare.com/api/v1"
 
 export function getToken() {
   if (typeof window === "undefined") return null
