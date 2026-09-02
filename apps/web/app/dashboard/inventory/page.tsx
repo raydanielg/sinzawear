@@ -9,10 +9,12 @@ import { Skeleton } from "@workspace/ui/components/skeleton"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@workspace/ui/components/table"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Package02Icon, Alert02Icon, CancelCircleIcon, Search01Icon, CheckmarkCircle02Icon } from "@hugeicons/core-free-icons"
-import { api, formatTZS } from "@/lib/api"
+import { api, formatTZS, withBranch } from "@/lib/api"
 import type { BranchStock } from "@/lib/types"
+import { useBranch } from "@/lib/branch-context"
 
 export default function InventoryPage() {
+  const { branchParam } = useBranch()
   const [stocks, setStocks] = useState<BranchStock[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
@@ -20,7 +22,7 @@ export default function InventoryPage() {
   useEffect(() => {
     async function fetchStock() {
       try {
-        const res = await api.get("/inventory")
+        const res = await api.get(withBranch("/inventory", branchParam))
         if (res.success) setStocks(res.data.stocks || res.data.stock || [])
       } catch {
       } finally {
@@ -28,7 +30,7 @@ export default function InventoryPage() {
       }
     }
     fetchStock()
-  }, [])
+  }, [branchParam])
 
   const filtered = stocks.filter((s) => {
     const q = search.toLowerCase()

@@ -34,6 +34,27 @@ import {
   ArrowLeftRightIcon,
   Cash01Icon,
   PrinterIcon,
+  ReceiptIcon,
+  TruckIcon,
+  Wallet01Icon,
+  Book01Icon,
+  ArrowDataTransferHorizontalIcon,
+  BanknoteIcon,
+  ChartLineIcon,
+  ClipboardListIcon,
+  BoxesIcon,
+  CalendarIcon,
+  MoneyCheckIcon,
+  Bell01Icon,
+  ShoppingCart01Icon,
+  CreditCardIcon,
+  CarIcon,
+  PalletIcon,
+  CubeIcon,
+  FileAltIcon,
+  DesktopIcon,
+  TaxIcon,
+  BuildingIcon,
 } from "@hugeicons/core-free-icons"
 
 const data = {
@@ -63,29 +84,54 @@ const data = {
       ],
     },
     {
+      title: "Dashboard Analytics",
+      url: "/dashboard/executive/analytics",
+      icon: (
+        <HugeiconsIcon icon={ChartLineIcon} strokeWidth={2} />
+      ),
+      items: [
+        { title: "Business Analytics", url: "/dashboard/executive/analytics" },
+        { title: "HR Analytics", url: "/dashboard/executive/hr-analytics" },
+      ],
+    },
+    {
+      title: "Banking",
+      url: "/dashboard/accounting/banking",
+      icon: (
+        <HugeiconsIcon icon={BanknoteIcon} strokeWidth={2} />
+      ),
+      items: [
+        { title: "Banking Overview", url: "/dashboard/accounting/banking" },
+        { title: "Fund Transfer", url: "/dashboard/transactions/fund-transfer" },
+      ],
+    },
+    {
       title: "Sales",
-      url: "/dashboard/pos",
+      url: "/dashboard/sales",
       icon: (
         <HugeiconsIcon icon={Cash01Icon} strokeWidth={2} />
       ),
       items: [
+        { title: "Sales Transactions", url: "/dashboard/sales" },
         { title: "POS", url: "/dashboard/pos" },
-        { title: "Sales", url: "/dashboard/sales" },
+        { title: "Sales Receipts", url: "/dashboard/sales-receipts" },
+        { title: "Invoices", url: "/dashboard/invoices" },
+        { title: "Proforma", url: "/dashboard/proforma" },
         { title: "Returns", url: "/dashboard/returns" },
+        { title: "Clients", url: "/dashboard/customers" },
+        { title: "Receive Payment", url: "/dashboard/payments/receive" },
       ],
     },
     {
-      title: "Inventory",
-      url: "/dashboard/inventory",
+      title: "Expenses",
+      url: "/dashboard/expenses",
       icon: (
-        <HugeiconsIcon icon={Package02Icon} strokeWidth={2} />
+        <HugeiconsIcon icon={Wallet01Icon} strokeWidth={2} />
       ),
       items: [
-        { title: "Products", url: "/dashboard/products" },
-        { title: "Stock", url: "/dashboard/inventory" },
-        { title: "Movements", url: "/dashboard/inventory/movements" },
-        { title: "Transfers", url: "/dashboard/inventory/transfers" },
-        { title: "Adjustments", url: "/dashboard/inventory/adjustments" },
+        { title: "Expense Transactions", url: "/dashboard/expenses" },
+        { title: "Suppliers/Vendors", url: "/dashboard/purchases/suppliers" },
+        { title: "Pay Bills", url: "/dashboard/bills/pay" },
       ],
     },
     {
@@ -96,28 +142,78 @@ const data = {
       ),
       items: [
         { title: "Purchases", url: "/dashboard/purchases" },
-        { title: "Suppliers", url: "/dashboard/suppliers" },
+        { title: "Suppliers", url: "/dashboard/purchases/suppliers" },
+        { title: "Pay Bills", url: "/dashboard/bills/pay" },
       ],
     },
     {
-      title: "Customers",
-      url: "/dashboard/customers",
+      title: "Product & Services",
+      url: "/dashboard/products",
       icon: (
-        <HugeiconsIcon icon={UsersIcon} strokeWidth={2} />
+        <HugeiconsIcon icon={Package02Icon} strokeWidth={2} />
       ),
       items: [
-        { title: "All Customers", url: "/dashboard/customers" },
+        { title: "Products", url: "/dashboard/products" },
+        { title: "Inventory", url: "/dashboard/inventory" },
+        { title: "Stock Movements", url: "/dashboard/inventory/movements" },
+        { title: "Transfers", url: "/dashboard/inventory/transfers" },
+        { title: "Adjustments", url: "/dashboard/inventory/adjustments" },
       ],
     },
     {
-      title: "Finance",
-      url: "/dashboard/expenses",
+      title: "Transactions",
+      url: "/dashboard/transactions",
       icon: (
-        <HugeiconsIcon icon={CoinsIcon} strokeWidth={2} />
+        <HugeiconsIcon icon={ArrowLeftRightIcon} strokeWidth={2} />
       ),
       items: [
-        { title: "Expenses", url: "/dashboard/expenses" },
-        { title: "Accounting", url: "/dashboard/accounting" },
+        { title: "All Transactions", url: "/dashboard/transactions" },
+        { title: "Subscription Sale", url: "/dashboard/transactions/subscription-sale" },
+        { title: "Sales Order", url: "/dashboard/transactions/sales-order" },
+        { title: "Credit Sale/Loan", url: "/dashboard/transactions/credit-sale" },
+        { title: "Credit Memo", url: "/dashboard/transactions/credit-memo" },
+        { title: "Sales Refund", url: "/dashboard/transactions/sales-refund" },
+        { title: "Payroll Liabilities", url: "/dashboard/transactions/payroll-liabilities" },
+        { title: "Vendor Credit", url: "/dashboard/transactions/vendor-credit" },
+        { title: "Employee Allowance", url: "/dashboard/transactions/employee-allowance" },
+        { title: "Employee Deduction", url: "/dashboard/transactions/employee-deduction" },
+        { title: "Employee Loan", url: "/dashboard/transactions/employee-loan" },
+        { title: "Mid Month Payroll", url: "/dashboard/transactions/mid-month-payroll" },
+        { title: "Journal Entry", url: "/dashboard/transactions/journal-entry" },
+        { title: "Journal Adjustment", url: "/dashboard/transactions/journal-adjustment" },
+        { title: "Fund Transfer", url: "/dashboard/transactions/fund-transfer" },
+        { title: "Owners Deposit", url: "/dashboard/transactions/owners-deposit" },
+        { title: "Owners Drawing", url: "/dashboard/transactions/owners-drawing" },
+        { title: "Give Loan", url: "/dashboard/transactions/give-loan" },
+        { title: "Loan Deposit", url: "/dashboard/transactions/loan-deposit" },
+        { title: "Loan Repayment", url: "/dashboard/transactions/loan-repayment" },
+        { title: "Receive Loan Repayment", url: "/dashboard/transactions/receive-loan-repayment" },
+      ],
+    },
+    {
+      title: "HR",
+      url: "/dashboard/hr",
+      icon: (
+        <HugeiconsIcon icon={UserGroupIcon} strokeWidth={2} />
+      ),
+      items: [
+        { title: "Overview", url: "/dashboard/hr" },
+        { title: "Employees", url: "/dashboard/hr/employees" },
+        { title: "Departments", url: "/dashboard/hr/departments" },
+        { title: "Attendance", url: "/dashboard/hr/attendance" },
+        { title: "Payroll", url: "/dashboard/hr/payroll" },
+        { title: "Staff Leave", url: "/dashboard/hr/leave" },
+      ],
+    },
+    {
+      title: "Accounting",
+      url: "/dashboard/accounting",
+      icon: (
+        <HugeiconsIcon icon={Book01Icon} strokeWidth={2} />
+      ),
+      items: [
+        { title: "P&L Statement", url: "/dashboard/accounting" },
+        { title: "Banking & Cash", url: "/dashboard/accounting/banking" },
         { title: "Cash Register", url: "/dashboard/cash-register" },
       ],
     },
@@ -134,28 +230,21 @@ const data = {
         { title: "Inventory Report", url: "/dashboard/reports/inventory" },
         { title: "Purchases Report", url: "/dashboard/reports/purchases" },
         { title: "Branches Report", url: "/dashboard/reports/branches" },
+        { title: "Executive Analytics", url: "/dashboard/executive/analytics" },
+        { title: "HR Analytics", url: "/dashboard/executive/hr-analytics" },
       ],
     },
     {
       title: "Management",
       url: "/dashboard/branches",
       icon: (
-        <HugeiconsIcon icon={UserGroupIcon} strokeWidth={2} />
+        <HugeiconsIcon icon={Store02Icon} strokeWidth={2} />
       ),
       items: [
         { title: "Branches", url: "/dashboard/branches" },
         { title: "Users", url: "/dashboard/users" },
         { title: "Roles & Permissions", url: "/dashboard/settings/roles" },
-      ],
-    },
-    {
-      title: "Audit Logs",
-      url: "/dashboard/audit-logs",
-      icon: (
-        <HugeiconsIcon icon={File02Icon} strokeWidth={2} />
-      ),
-      items: [
-        { title: "Activity Log", url: "/dashboard/audit-logs" },
+        { title: "Audit Logs", url: "/dashboard/audit-logs" },
       ],
     },
     {
@@ -165,7 +254,8 @@ const data = {
         <HugeiconsIcon icon={Settings05Icon} strokeWidth={2} />
       ),
       items: [
-        { title: "Business", url: "/dashboard/settings" },
+        { title: "System Definitions", url: "/dashboard/settings" },
+        { title: "Business Info", url: "/dashboard/settings" },
         { title: "Roles", url: "/dashboard/settings/roles" },
       ],
     },
@@ -176,6 +266,13 @@ const data = {
       url: "/dashboard/pos",
       icon: (
         <HugeiconsIcon icon={Cash01Icon} strokeWidth={2} />
+      ),
+    },
+    {
+      name: "New Invoice",
+      url: "/dashboard/invoices/new",
+      icon: (
+        <HugeiconsIcon icon={File02Icon} strokeWidth={2} />
       ),
     },
     {
@@ -190,6 +287,76 @@ const data = {
       url: "/dashboard/purchases/new",
       icon: (
         <HugeiconsIcon icon={PackageReceiveIcon} strokeWidth={2} />
+      ),
+    },
+    {
+      name: "Add Supplier",
+      url: "/dashboard/purchases/suppliers/new",
+      icon: (
+        <HugeiconsIcon icon={TruckIcon} strokeWidth={2} />
+      ),
+    },
+    {
+      name: "Add Client",
+      url: "/dashboard/customers/new",
+      icon: (
+        <HugeiconsIcon icon={UsersIcon} strokeWidth={2} />
+      ),
+    },
+    {
+      name: "Add Staff",
+      url: "/dashboard/users/new",
+      icon: (
+        <HugeiconsIcon icon={UserGroupIcon} strokeWidth={2} />
+      ),
+    },
+    {
+      name: "Pay Bills",
+      url: "/dashboard/bills/pay",
+      icon: (
+        <HugeiconsIcon icon={CoinsIcon} strokeWidth={2} />
+      ),
+    },
+    {
+      name: "Sales Receipts",
+      url: "/dashboard/sales-receipts",
+      icon: (
+        <HugeiconsIcon icon={ReceiptIcon} strokeWidth={2} />
+      ),
+    },
+    {
+      name: "Add Employee",
+      url: "/dashboard/hr/employees",
+      icon: (
+        <HugeiconsIcon icon={UserGroupIcon} strokeWidth={2} />
+      ),
+    },
+    {
+      name: "Run Payroll",
+      url: "/dashboard/hr/payroll",
+      icon: (
+        <HugeiconsIcon icon={Wallet01Icon} strokeWidth={2} />
+      ),
+    },
+    {
+      name: "Journal Entry",
+      url: "/dashboard/transactions/journal-entry",
+      icon: (
+        <HugeiconsIcon icon={Book01Icon} strokeWidth={2} />
+      ),
+    },
+    {
+      name: "Fund Transfer",
+      url: "/dashboard/transactions/fund-transfer",
+      icon: (
+        <HugeiconsIcon icon={ArrowDataTransferHorizontalIcon} strokeWidth={2} />
+      ),
+    },
+    {
+      name: "Give Loan",
+      url: "/dashboard/transactions/give-loan",
+      icon: (
+        <HugeiconsIcon icon={BanknoteIcon} strokeWidth={2} />
       ),
     },
   ],

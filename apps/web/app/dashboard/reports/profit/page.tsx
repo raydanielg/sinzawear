@@ -9,12 +9,14 @@ import { Label } from "@workspace/ui/components/label"
 import { Skeleton } from "@workspace/ui/components/skeleton"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Download04Icon, ChartIcon } from "@hugeicons/core-free-icons"
-import { api, formatTZS } from "@/lib/api"
+import { api, formatTZS, withBranch } from "@/lib/api"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts"
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
+import { useBranch } from "@/lib/branch-context"
 
 export default function ProfitReportPage() {
+  const { branchParam } = useBranch()
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [fromDate, setFromDate] = useState("")
@@ -27,6 +29,7 @@ export default function ProfitReportPage() {
         const params = new URLSearchParams()
         if (fromDate) params.set("from", fromDate)
         if (toDate) params.set("to", toDate)
+        if (branchParam) params.set("branchId", branchParam)
         const res = await api.get(`/reports/profit-loss${params.toString() ? `?${params}` : ""}`)
         if (res.success) setData(res.data)
       } catch {
@@ -35,7 +38,7 @@ export default function ProfitReportPage() {
       }
     }
     fetchData()
-  }, [fromDate, toDate])
+  }, [fromDate, toDate, branchParam])
 
   return (
     <DashboardLayout breadcrumbs={[

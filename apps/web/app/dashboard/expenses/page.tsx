@@ -13,8 +13,9 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@work
 import { toast } from "sonner"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { PlusIcon, CoinsIcon, Search01Icon, TrashIcon } from "@hugeicons/core-free-icons"
-import { api, formatTZS, formatDate } from "@/lib/api"
+import { api, formatTZS, formatDate, withBranch } from "@/lib/api"
 import type { Expense, Branch } from "@/lib/types"
+import { useBranch } from "@/lib/branch-context"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,6 +24,7 @@ import {
 } from "@workspace/ui/components/dropdown-menu"
 
 export default function ExpensesPage() {
+  const { branchParam } = useBranch()
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [branches, setBranches] = useState<Branch[]>([])
   const [loading, setLoading] = useState(true)
@@ -35,7 +37,7 @@ export default function ExpensesPage() {
     async function fetchData() {
       try {
         const [expRes, branchRes] = await Promise.all([
-          api.get("/expenses"),
+          api.get(withBranch("/expenses", branchParam)),
           api.get("/branches"),
         ])
         if (expRes.success) setExpenses(expRes.data.expenses || [])
@@ -46,7 +48,7 @@ export default function ExpensesPage() {
       }
     }
     fetchData()
-  }, [])
+  }, [branchParam])
 
   const filtered = expenses.filter((e) => {
     const q = search.toLowerCase()

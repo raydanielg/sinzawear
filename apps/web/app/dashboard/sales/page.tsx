@@ -12,12 +12,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { toast } from "sonner"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { ShoppingBag01Icon, Search01Icon, PlusIcon, EyeIcon, PrinterIcon, DownloadIcon, ReturnRequestIcon } from "@hugeicons/core-free-icons"
-import { api, formatTZS, formatDateTime } from "@/lib/api"
+import { api, formatTZS, formatDateTime, withBranch } from "@/lib/api"
 import type { Sale } from "@/lib/types"
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
+import { useBranch } from "@/lib/branch-context"
 
 export default function SalesPage() {
+  const { branchParam } = useBranch()
   const [sales, setSales] = useState<Sale[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
@@ -25,7 +27,7 @@ export default function SalesPage() {
   useEffect(() => {
     async function fetchSales() {
       try {
-        const res = await api.get("/sales")
+        const res = await api.get(withBranch("/sales", branchParam))
         if (res.success) setSales(res.data.sales || [])
       } catch {
       } finally {
@@ -33,7 +35,7 @@ export default function SalesPage() {
       }
     }
     fetchSales()
-  }, [])
+  }, [branchParam])
 
   const filtered = sales.filter((s) => {
     const q = search.toLowerCase()

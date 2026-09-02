@@ -36,22 +36,40 @@ import {
   UserCircleIcon,
   Logout01Icon,
   Settings05Icon,
+  FlashIcon,
+  File02Icon,
+  FileAddIcon,
+  Cash01Icon,
+  ReceiptIcon,
+  UsersIcon,
+  UserGroupIcon,
+  PackageReceiveIcon,
+  CoinsIcon,
+  TruckIcon,
+  ShoppingBag01Icon,
+  ChartIcon,
+  Calendar03Icon,
+  Wallet01Icon,
+  Book01Icon,
+  ArrowDataTransferHorizontalIcon,
+  BanknoteIcon,
+  ArrowLeftRightIcon,
 } from "@hugeicons/core-free-icons"
 import { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { api, getUser, clearAuth } from "@/lib/api"
+import { useBranch } from "@/lib/branch-context"
 
 interface DashboardLayoutProps {
   children: React.ReactNode
   breadcrumbs: { label: string; href?: string }[]
 }
 
-export function DashboardLayout({ children, breadcrumbs }: DashboardLayoutProps) {
+function DashboardInner({ children, breadcrumbs }: DashboardLayoutProps) {
   const router = useRouter()
+  const { selectedBranch, setSelectedBranch, branches, setBranches } = useBranch()
   const [user, setUser] = useState<{ name: string; email: string; roles?: string[] } | null>(null)
-  const [branches, setBranches] = useState<{ id: string; name: string }[]>([])
-  const [selectedBranch, setSelectedBranch] = useState<string>("all")
   const [notifications, setNotifications] = useState<{ id: string; title: string; message: string; isRead: boolean }[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [searchResults, setSearchResults] = useState<{ products: any[]; customers: any[] }>({ products: [], customers: [] })
@@ -197,6 +215,82 @@ export function DashboardLayout({ children, breadcrumbs }: DashboardLayoutProps)
             </DropdownMenu>
 
             <DropdownMenu>
+              <DropdownMenuTrigger render={<Button variant="default" size="sm" className="gap-2" />}>
+                <HugeiconsIcon icon={FlashIcon} strokeWidth={2} className="size-4" />
+                <span className="hidden sm:inline">Quick Actions</span>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>Create New</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => router.push("/dashboard/invoices/new")}>
+                  <HugeiconsIcon icon={FileAddIcon} strokeWidth={2} className="size-4" /> Add Invoice
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/dashboard/proforma/new")}>
+                  <HugeiconsIcon icon={File02Icon} strokeWidth={2} className="size-4" /> Add Proforma
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/dashboard/payments/receive")}>
+                  <HugeiconsIcon icon={Cash01Icon} strokeWidth={2} className="size-4" /> Receive Payment
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/dashboard/sales-receipts")}>
+                  <HugeiconsIcon icon={ReceiptIcon} strokeWidth={2} className="size-4" /> Sales Receipts
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/dashboard/pos")}>
+                  <HugeiconsIcon icon={ShoppingBag01Icon} strokeWidth={2} className="size-4" /> POS
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => router.push("/dashboard/customers/new")}>
+                  <HugeiconsIcon icon={UsersIcon} strokeWidth={2} className="size-4" /> Add New Client
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/dashboard/users/new")}>
+                  <HugeiconsIcon icon={UserGroupIcon} strokeWidth={2} className="size-4" /> Add Staff
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => router.push("/dashboard/purchases/new")}>
+                  <HugeiconsIcon icon={PackageReceiveIcon} strokeWidth={2} className="size-4" /> Add Purchase Order
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/dashboard/bills/pay")}>
+                  <HugeiconsIcon icon={CoinsIcon} strokeWidth={2} className="size-4" /> Pay Bills
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/dashboard/expenses")}>
+                  <HugeiconsIcon icon={CoinsIcon} strokeWidth={2} className="size-4" /> Add Expenses
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/dashboard/purchases/suppliers/new")}>
+                  <HugeiconsIcon icon={TruckIcon} strokeWidth={2} className="size-4" /> Add Supplier
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => router.push("/dashboard/hr/employees")}>
+                  <HugeiconsIcon icon={UserGroupIcon} strokeWidth={2} className="size-4" /> HR Module
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/dashboard/hr/attendance")}>
+                  <HugeiconsIcon icon={Calendar03Icon} strokeWidth={2} className="size-4" /> Mark Attendance
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/dashboard/hr/payroll")}>
+                  <HugeiconsIcon icon={Wallet01Icon} strokeWidth={2} className="size-4" /> Run Payroll
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/dashboard/hr/leave")}>
+                  <HugeiconsIcon icon={Calendar03Icon} strokeWidth={2} className="size-4" /> Leave Requests
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => router.push("/dashboard/transactions")}>
+                  <HugeiconsIcon icon={ArrowLeftRightIcon} strokeWidth={2} className="size-4" /> All Transactions
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/dashboard/transactions/journal-entry")}>
+                  <HugeiconsIcon icon={Book01Icon} strokeWidth={2} className="size-4" /> Journal Entry
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/dashboard/transactions/fund-transfer")}>
+                  <HugeiconsIcon icon={ArrowDataTransferHorizontalIcon} strokeWidth={2} className="size-4" /> Fund Transfer
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/dashboard/transactions/give-loan")}>
+                  <HugeiconsIcon icon={BanknoteIcon} strokeWidth={2} className="size-4" /> Give Loan
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => router.push("/dashboard/reports")}>
+                  <HugeiconsIcon icon={ChartIcon} strokeWidth={2} className="size-4" /> Reports
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
               <DropdownMenuTrigger render={<Button variant="ghost" size="icon" className="relative" />}>
                   <HugeiconsIcon icon={Notification03Icon} strokeWidth={2} className="size-5" />
                   {unreadCount > 0 && (
@@ -257,5 +351,11 @@ export function DashboardLayout({ children, breadcrumbs }: DashboardLayoutProps)
       </SidebarInset>
       <Toaster />
     </SidebarProvider>
+  )
+}
+
+export function DashboardLayout({ children, breadcrumbs }: DashboardLayoutProps) {
+  return (
+    <DashboardInner breadcrumbs={breadcrumbs}>{children}</DashboardInner>
   )
 }

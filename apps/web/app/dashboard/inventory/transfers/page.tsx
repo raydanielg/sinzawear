@@ -8,7 +8,8 @@ import { Button } from "@workspace/ui/components/button"
 import { Skeleton } from "@workspace/ui/components/skeleton"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { PlusIcon, ArrowLeftRightIcon } from "@hugeicons/core-free-icons"
-import { api, formatDateTime } from "@/lib/api"
+import { api, formatDateTime, withBranch } from "@/lib/api"
+import { useBranch } from "@/lib/branch-context"
 
 interface Transfer {
   id: string
@@ -30,13 +31,14 @@ const statusVariant: Record<string, "default" | "secondary" | "destructive"> = {
 }
 
 export default function TransfersPage() {
+  const { branchParam } = useBranch()
   const [transfers, setTransfers] = useState<Transfer[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function fetchTransfers() {
       try {
-        const res = await api.get("/inventory/transfers")
+        const res = await api.get(withBranch("/inventory/transfers", branchParam))
         if (res.success) setTransfers(res.data.transfers || [])
       } catch {
         // API not connected
@@ -45,7 +47,7 @@ export default function TransfersPage() {
       }
     }
     fetchTransfers()
-  }, [])
+  }, [branchParam])
 
   return (
     <DashboardLayout breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Inventory", href: "/dashboard/inventory" }, { label: "Transfers" }]}>

@@ -9,10 +9,12 @@ import { Skeleton } from "@workspace/ui/components/skeleton"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@workspace/ui/components/table"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Search01Icon, ReturnRequestIcon } from "@hugeicons/core-free-icons"
-import { api, formatTZS, formatDateTime } from "@/lib/api"
+import { api, formatTZS, formatDateTime, withBranch } from "@/lib/api"
 import type { SaleReturn } from "@/lib/types"
+import { useBranch } from "@/lib/branch-context"
 
 export default function ReturnsPage() {
+  const { branchParam } = useBranch()
   const [returns, setReturns] = useState<SaleReturn[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
@@ -20,7 +22,7 @@ export default function ReturnsPage() {
   useEffect(() => {
     async function fetchReturns() {
       try {
-        const res = await api.get("/sales/returns")
+        const res = await api.get(withBranch("/sales/returns", branchParam))
         if (res.success) setReturns(res.data.returns || [])
       } catch {
       } finally {
@@ -28,7 +30,7 @@ export default function ReturnsPage() {
       }
     }
     fetchReturns()
-  }, [])
+  }, [branchParam])
 
   const filtered = returns.filter((r) => {
     const q = search.toLowerCase()

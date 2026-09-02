@@ -12,8 +12,9 @@ import { ScrollArea } from "@workspace/ui/components/scroll-area"
 import { toast } from "sonner"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Search01Icon, Delete02Icon, ShoppingCart01Icon, CheckmarkCircle02Icon, BarcodeIcon } from "@hugeicons/core-free-icons"
-import { api, formatTZS } from "@/lib/api"
+import { api, formatTZS, withBranch } from "@/lib/api"
 import type { Product, Category } from "@/lib/types"
+import { useBranch } from "@/lib/branch-context"
 
 interface CartItem {
   variantId: string
@@ -34,6 +35,7 @@ const PAYMENT_METHODS = [
 ]
 
 export default function POSPage() {
+  const { branchParam } = useBranch()
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
@@ -49,7 +51,7 @@ export default function POSPage() {
   const loadProducts = useCallback(async () => {
     try {
       const [prodRes, catRes] = await Promise.all([
-        api.get("/products"),
+        api.get(withBranch("/products", branchParam)),
         api.get("/products/categories/list"),
       ])
       if (prodRes.success) setProducts(prodRes.data.products || [])
@@ -58,7 +60,7 @@ export default function POSPage() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [branchParam])
 
   useEffect(() => { loadProducts() }, [loadProducts])
 

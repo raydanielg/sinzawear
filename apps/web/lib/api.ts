@@ -55,6 +55,12 @@ export const api = {
   delete: (path: string) => apiFetch(path, { method: "DELETE" }),
 }
 
+export function withBranch(path: string, branchId: string) {
+  if (!branchId) return path
+  const sep = path.includes("?") ? "&" : "?"
+  return `${path}${sep}branchId=${branchId}`
+}
+
 export function formatTZS(amount: number) {
   if (!amount && amount !== 0) return "TZS 0"
   return `TZS ${Number(amount).toLocaleString("en-US")}`

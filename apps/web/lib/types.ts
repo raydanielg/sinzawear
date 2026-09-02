@@ -377,6 +377,401 @@ export interface DashboardData {
   netProfit: number
 }
 
+export interface Department {
+  id: string
+  name: string
+  description?: string
+  branchId?: string
+  branch?: Branch
+  createdAt: string
+  _count?: { employees: number }
+}
+
+export interface Employee {
+  id: string
+  employeeNumber: string
+  firstName: string
+  lastName: string
+  fullName?: string
+  email: string
+  phone?: string
+  address?: string
+  gender?: string
+  dateOfBirth?: string
+  departmentId?: string
+  department?: Department
+  position: string
+  employmentType: string
+  hireDate: string
+  salary: number
+  allowance?: number
+  status: string
+  branchId?: string
+  branch?: Branch
+  userId?: string
+  user?: User
+  createdAt: string
+}
+
+export interface Attendance {
+  id: string
+  employeeId: string
+  employee?: Employee
+  date: string
+  checkIn?: string
+  checkOut?: string
+  status: string
+  notes?: string
+  workHours?: number
+  overtimeHours?: number
+  createdAt: string
+}
+
+export interface Payroll {
+  id: string
+  payrollNumber: string
+  employeeId: string
+  employee?: Employee
+  month: number
+  year: number
+  basicSalary: number
+  allowances: number
+  overtimePay: number
+  deductions: number
+  taxDeduction: number
+  netPay: number
+  status: string
+  paymentDate?: string
+  paymentMethod?: string
+  reference?: string
+  createdAt: string
+}
+
+export interface LeaveRequest {
+  id: string
+  leaveNumber: string
+  employeeId: string
+  employee?: Employee
+  type: string
+  startDate: string
+  endDate: string
+  days: number
+  reason: string
+  status: string
+  approvedBy?: { name: string }
+  approvedAt?: string
+  createdAt: string
+}
+
+export interface SubscriptionSale {
+  id: string
+  subscriptionNumber: string
+  customerId: string
+  customer?: Customer
+  planName: string
+  amount: number
+  billingCycle: string
+  startDate: string
+  endDate?: string
+  nextBillingDate?: string
+  status: string
+  autoRenew: boolean
+  branchId?: string
+  branch?: Branch
+  createdAt: string
+}
+
+export interface SalesOrder {
+  id: string
+  orderNumber: string
+  customerId: string
+  customer?: Customer
+  orderDate: string
+  expectedDeliveryDate?: string
+  items: SalesOrderItem[]
+  subtotal: number
+  taxAmount: number
+  discountAmount: number
+  totalAmount: number
+  status: string
+  notes?: string
+  branchId?: string
+  branch?: Branch
+  createdAt: string
+}
+
+export interface SalesOrderItem {
+  id: string
+  productVariantId: string
+  productVariant?: { product?: { name: string }; sku: string }
+  quantity: number
+  unitPrice: number
+  totalPrice: number
+}
+
+export interface CreditSale {
+  id: string
+  creditNumber: string
+  customerId: string
+  customer?: Customer
+  saleId?: string
+  sale?: Sale
+  amount: number
+  paidAmount: number
+  balance: number
+  interestRate?: number
+  dueDate: string
+  status: string
+  branchId?: string
+  branch?: Branch
+  createdAt: string
+}
+
+export interface CreditMemo {
+  id: string
+  memoNumber: string
+  customerId: string
+  customer?: Customer
+  saleId?: string
+  sale?: Sale
+  amount: number
+  reason: string
+  status: string
+  appliedAmount: number
+  branchId?: string
+  branch?: Branch
+  createdAt: string
+}
+
+export interface SalesRefund {
+  id: string
+  refundNumber: string
+  customerId: string
+  customer?: Customer
+  saleId: string
+  sale?: Sale
+  amount: number
+  reason: string
+  refundMethod: string
+  status: string
+  branchId?: string
+  branch?: Branch
+  createdAt: string
+}
+
+export interface PayrollLiability {
+  id: string
+  liabilityNumber: string
+  payrollId?: string
+  payroll?: Payroll
+  employeeId: string
+  employee?: Employee
+  type: string
+  amount: number
+  paidAmount: number
+  balance: number
+  dueDate: string
+  status: string
+  branchId?: string
+  branch?: Branch
+  createdAt: string
+}
+
+export interface VendorCredit {
+  id: string
+  creditNumber: string
+  supplierId: string
+  supplier?: Supplier
+  purchaseId?: string
+  purchase?: Purchase
+  amount: number
+  appliedAmount: number
+  balance: number
+  reason: string
+  status: string
+  branchId?: string
+  branch?: Branch
+  createdAt: string
+}
+
+export interface EmployeeAllowance {
+  id: string
+  employeeId: string
+  employee?: Employee
+  type: string
+  amount: number
+  frequency: string
+  effectiveDate: string
+  endDate?: string
+  status: string
+  notes?: string
+  branchId?: string
+  branch?: Branch
+  createdAt: string
+}
+
+export interface EmployeeDeduction {
+  id: string
+  employeeId: string
+  employee?: Employee
+  type: string
+  amount: number
+  frequency: string
+  effectiveDate: string
+  endDate?: string
+  status: string
+  notes?: string
+  branchId?: string
+  branch?: Branch
+  createdAt: string
+}
+
+export interface EmployeeLoan {
+  id: string
+  loanNumber: string
+  employeeId: string
+  employee?: Employee
+  principalAmount: number
+  interestRate: number
+  totalRepayable: number
+  paidAmount: number
+  balance: number
+  installmentAmount: number
+  installments: number
+  paidInstallments: number
+  startDate: string
+  status: string
+  notes?: string
+  branchId?: string
+  branch?: Branch
+  createdAt: string
+}
+
+export interface JournalEntry {
+  id: string
+  entryNumber: string
+  date: string
+  description: string
+  reference?: string
+  lines: JournalLine[]
+  totalDebit: number
+  totalCredit: number
+  status: string
+  branchId?: string
+  branch?: Branch
+  createdBy?: { name: string }
+  createdAt: string
+}
+
+export interface JournalLine {
+  id: string
+  accountName: string
+  accountCode: string
+  debit: number
+  credit: number
+  description?: string
+}
+
+export interface JournalAdjustment {
+  id: string
+  adjustmentNumber: string
+  date: string
+  reason: string
+  originalEntryId?: string
+  originalEntry?: JournalEntry
+  lines: JournalLine[]
+  totalDebit: number
+  totalCredit: number
+  status: string
+  branchId?: string
+  branch?: Branch
+  createdAt: string
+}
+
+export interface FundTransfer {
+  id: string
+  transferNumber: string
+  fromAccount: string
+  toAccount: string
+  amount: number
+  fee: number
+  date: string
+  reference?: string
+  notes?: string
+  status: string
+  branchId?: string
+  branch?: Branch
+  createdAt: string
+}
+
+export interface OwnersDeposit {
+  id: string
+  depositNumber: string
+  ownerName: string
+  amount: number
+  date: string
+  account: string
+  notes?: string
+  status: string
+  branchId?: string
+  branch?: Branch
+  createdAt: string
+}
+
+export interface OwnersDrawing {
+  id: string
+  drawingNumber: string
+  ownerName: string
+  amount: number
+  date: string
+  account: string
+  reason?: string
+  notes?: string
+  status: string
+  branchId?: string
+  branch?: Branch
+  createdAt: string
+}
+
+export interface Loan {
+  id: string
+  loanNumber: string
+  borrowerName: string
+  borrowerType: string
+  principalAmount: number
+  interestRate: number
+  totalRepayable: number
+  paidAmount: number
+  balance: number
+  installmentAmount: number
+  installments: number
+  paidInstallments: number
+  startDate: string
+  endDate?: string
+  status: string
+  notes?: string
+  branchId?: string
+  branch?: Branch
+  createdAt: string
+}
+
+export interface LoanRepayment {
+  id: string
+  repaymentNumber: string
+  loanId: string
+  loan?: Loan
+  amount: number
+  principalPortion: number
+  interestPortion: number
+  date: string
+  paymentMethod: string
+  reference?: string
+  status: string
+  branchId?: string
+  branch?: Branch
+  createdAt: string
+}
+
 export interface ApiResult<T = unknown> {
   success: boolean
   message?: string

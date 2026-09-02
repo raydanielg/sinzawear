@@ -10,13 +10,15 @@ import { Input } from "@workspace/ui/components/input"
 import { Skeleton } from "@workspace/ui/components/skeleton"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Shirt01Icon, PlusIcon, Search01Icon, Package02Icon, Upload01Icon, Download01Icon } from "@hugeicons/core-free-icons"
-import { api, formatTZS } from "@/lib/api"
+import { api, formatTZS, withBranch } from "@/lib/api"
 import type { Product, Category, Brand } from "@/lib/types"
 import { toast } from "sonner"
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
+import { useBranch } from "@/lib/branch-context"
 
 export default function ProductsPage() {
+  const { branchParam } = useBranch()
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [brands, setBrands] = useState<Brand[]>([])
@@ -29,7 +31,7 @@ export default function ProductsPage() {
     async function fetchProducts() {
       try {
         const [prodRes, catRes, brandRes] = await Promise.all([
-          api.get("/products"),
+          api.get(withBranch("/products", branchParam)),
           api.get("/products/categories/list"),
           api.get("/products/brands/list"),
         ])
@@ -42,7 +44,7 @@ export default function ProductsPage() {
       }
     }
     fetchProducts()
-  }, [])
+  }, [branchParam])
 
   const filtered = products.filter((p) => {
     const q = search.toLowerCase()

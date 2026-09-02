@@ -33,10 +33,12 @@ import {
   Store02Icon,
   File02Icon,
 } from "@hugeicons/core-free-icons"
-import { api, formatTZS, formatDateTime } from "@/lib/api"
+import { api, formatTZS, formatDateTime, withBranch } from "@/lib/api"
 import type { DashboardData, Sale, BranchStock } from "@/lib/types"
+import { useBranch } from "@/lib/branch-context"
 
 export default function DashboardPage() {
+  const { branchParam } = useBranch()
   const [stats, setStats] = useState<DashboardData | null>(null)
   const [recentSales, setRecentSales] = useState<Sale[]>([])
   const [lowStock, setLowStock] = useState<BranchStock[]>([])
@@ -47,9 +49,9 @@ export default function DashboardPage() {
     async function fetchData() {
       try {
         const [dashRes, salesRes, lowStockRes, branchRes] = await Promise.all([
-          api.get("/reports/dashboard"),
-          api.get("/sales"),
-          api.get("/inventory/low-stock"),
+          api.get(withBranch("/reports/dashboard", branchParam)),
+          api.get(withBranch("/sales", branchParam)),
+          api.get(withBranch("/inventory/low-stock", branchParam)),
           api.get("/branches"),
         ])
         if (dashRes.success) setStats(dashRes.data)
@@ -62,7 +64,7 @@ export default function DashboardPage() {
       }
     }
     fetchData()
-  }, [])
+  }, [branchParam])
 
   const maxBranchSales = Math.max(...branches.map((b) => b._count?.sales || 0), 1)
 

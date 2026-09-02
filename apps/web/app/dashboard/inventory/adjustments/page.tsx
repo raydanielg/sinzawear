@@ -14,10 +14,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { toast } from "sonner"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { PlusIcon, Settings02Icon } from "@hugeicons/core-free-icons"
-import { api, formatDateTime } from "@/lib/api"
+import { api, formatDateTime, withBranch } from "@/lib/api"
 import type { StockMovement, Product, Branch } from "@/lib/types"
+import { useBranch } from "@/lib/branch-context"
 
 export default function AdjustmentsPage() {
+  const { branchParam } = useBranch()
   const [adjustments, setAdjustments] = useState<StockMovement[]>([])
   const [products, setProducts] = useState<Product[]>([])
   const [branches, setBranches] = useState<Branch[]>([])
@@ -30,8 +32,8 @@ export default function AdjustmentsPage() {
     async function fetchData() {
       try {
         const [adjRes, prodRes, branchRes] = await Promise.all([
-          api.get("/inventory/movements?type=adjustment"),
-          api.get("/products"),
+          api.get(withBranch("/inventory/movements?type=adjustment", branchParam)),
+          api.get(withBranch("/products", branchParam)),
           api.get("/branches"),
         ])
         if (adjRes.success) setAdjustments(adjRes.data.movements || [])
@@ -43,7 +45,7 @@ export default function AdjustmentsPage() {
       }
     }
     fetchData()
-  }, [])
+  }, [branchParam])
 
   const allVariants = products.flatMap((p) =>
     (p.variants || []).map((v) => ({

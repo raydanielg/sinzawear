@@ -9,11 +9,12 @@ import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import { Skeleton } from "@workspace/ui/components/skeleton"
 import { HugeiconsIcon } from "@hugeicons/react"
-import { ChartIcon, CoinsIcon, Package02Icon, ShoppingBag01Icon, Store01Icon, Download04Icon } from "@hugeicons/core-free-icons"
-import { api, formatTZS } from "@/lib/api"
+import { ChartIcon, CoinsIcon, Package02Icon, ShoppingBag01Icon, Store01Icon, Download04Icon, File02Icon, StarAwardIcon, UserGroupIcon, Wallet01Icon, BanknoteIcon, TruckIcon, Book01Icon, MapIcon, ReceiptIcon, Cash01Icon, TargetIcon } from "@hugeicons/core-free-icons"
+import { api, formatTZS, withBranch } from "@/lib/api"
 import type { Branch } from "@/lib/types"
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
+import { useBranch } from "@/lib/branch-context"
 
 interface PnLData {
   revenue: number
@@ -25,6 +26,7 @@ interface PnLData {
 }
 
 export default function ReportsPage() {
+  const { branchParam } = useBranch()
   const [pnl, setPnl] = useState<PnLData | null>(null)
   const [branches, setBranches] = useState<Branch[]>([])
   const [loading, setLoading] = useState(true)
@@ -50,6 +52,7 @@ export default function ReportsPage() {
         if (fromDate) params.set("from", fromDate)
         if (toDate) params.set("to", toDate)
         if (branchId) params.set("branchId", branchId)
+        if (!branchId && branchParam) params.set("branchId", branchParam)
         const res = await api.get(`/reports/profit-loss${params.toString() ? `?${params}` : ""}`)
         if (res.success) setPnl(res.data)
       } catch {
@@ -58,7 +61,7 @@ export default function ReportsPage() {
       }
     }
     fetchReports()
-  }, [fromDate, toDate, branchId])
+  }, [fromDate, toDate, branchId, branchParam])
 
   const reportLinks = [
     { label: "Sales Report", href: "/dashboard/reports/sales", icon: ShoppingBag01Icon, desc: "Sales by period, payment method, cashier" },
@@ -66,6 +69,22 @@ export default function ReportsPage() {
     { label: "Inventory Report", href: "/dashboard/reports/inventory", icon: Package02Icon, desc: "Stock valuation, turnover, low stock" },
     { label: "Purchase Report", href: "/dashboard/reports/purchases", icon: CoinsIcon, desc: "Purchases by supplier, branch, period" },
     { label: "Branch Report", href: "/dashboard/reports/branches", icon: Store01Icon, desc: "Compare performance across branches" },
+  ]
+
+  const reportCategories = [
+    { label: "My Favourite Reports", href: "/dashboard/reports", icon: StarAwardIcon, color: "text-emerald-600", bg: "bg-emerald-50 dark:bg-emerald-950/30", border: "border-emerald-200 dark:border-emerald-900" },
+    { label: "Accounting Reports", href: "/dashboard/accounting", icon: Book01Icon, color: "text-blue-600", bg: "bg-blue-50 dark:bg-blue-950/30", border: "border-blue-200 dark:border-blue-900" },
+    { label: "Budget Reports", href: "/dashboard/reports", icon: TargetIcon, color: "text-purple-600", bg: "bg-purple-50 dark:bg-purple-950/30", border: "border-purple-200 dark:border-purple-900" },
+    { label: "Employee Incentive Program Reports", href: "/dashboard/executive/hr-analytics", icon: StarAwardIcon, color: "text-amber-600", bg: "bg-amber-50 dark:bg-amber-950/30", border: "border-amber-200 dark:border-amber-900" },
+    { label: "Employee Reports", href: "/dashboard/hr/employees", icon: UserGroupIcon, color: "text-cyan-600", bg: "bg-cyan-50 dark:bg-cyan-950/30", border: "border-cyan-200 dark:border-cyan-900" },
+    { label: "Expense Reports", href: "/dashboard/expenses", icon: Wallet01Icon, color: "text-red-600", bg: "bg-red-50 dark:bg-red-950/30", border: "border-red-200 dark:border-red-900" },
+    { label: "Fleet Reports", href: "/dashboard/reports", icon: TruckIcon, color: "text-indigo-600", bg: "bg-indigo-50 dark:bg-indigo-950/30", border: "border-indigo-200 dark:border-indigo-900" },
+    { label: "Payroll Reports", href: "/dashboard/hr/payroll", icon: Cash01Icon, color: "text-green-600", bg: "bg-green-50 dark:bg-green-950/30", border: "border-green-200 dark:border-green-900" },
+    { label: "POS: Stock & Sales Reports", href: "/dashboard/reports/sales", icon: ReceiptIcon, color: "text-orange-600", bg: "bg-orange-50 dark:bg-orange-950/30", border: "border-orange-200 dark:border-orange-900" },
+    { label: "Project Reports", href: "/dashboard/reports", icon: MapIcon, color: "text-teal-600", bg: "bg-teal-50 dark:bg-teal-950/30", border: "border-teal-200 dark:border-teal-900" },
+    { label: "Sale Fulfillment Reports", href: "/dashboard/reports", icon: File02Icon, color: "text-pink-600", bg: "bg-pink-50 dark:bg-pink-950/30", border: "border-pink-200 dark:border-pink-900" },
+    { label: "Sales Reports", href: "/dashboard/reports/sales", icon: ShoppingBag01Icon, color: "text-blue-600", bg: "bg-blue-50 dark:bg-blue-950/30", border: "border-blue-200 dark:border-blue-900" },
+    { label: "Stock Reports", href: "/dashboard/reports/inventory", icon: Package02Icon, color: "text-violet-600", bg: "bg-violet-50 dark:bg-violet-950/30", border: "border-violet-200 dark:border-violet-900" },
   ]
 
   return (
@@ -171,6 +190,29 @@ export default function ReportsPage() {
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Report Categories Grid */}
+      <div>
+        <div className="mb-4 flex items-center gap-2">
+          <div className="h-6 w-1 rounded-full bg-primary" />
+          <div>
+            <h2 className="text-lg font-bold tracking-tight">Report Categories</h2>
+            <p className="text-sm text-muted-foreground">Browse reports by category</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {reportCategories.map((cat) => (
+            <Link key={cat.label} href={cat.href}>
+              <div className={`group flex items-center gap-3 rounded-xl border ${cat.border} ${cat.bg} p-4 transition-all hover:shadow-md hover:-translate-y-0.5 cursor-pointer`}>
+                <div className={`flex size-10 items-center justify-center rounded-lg bg-background shadow-sm`}>
+                  <HugeiconsIcon icon={cat.icon} strokeWidth={2} className={`size-5 ${cat.color}`} />
+                </div>
+                <span className="text-sm font-semibold leading-tight">{cat.label}</span>
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">

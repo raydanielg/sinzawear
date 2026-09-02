@@ -8,19 +8,21 @@ import { Skeleton } from "@workspace/ui/components/skeleton"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@workspace/ui/components/table"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Download04Icon, Store01Icon } from "@hugeicons/core-free-icons"
-import { api, formatTZS } from "@/lib/api"
+import { api, formatTZS, withBranch } from "@/lib/api"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts"
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
+import { useBranch } from "@/lib/branch-context"
 
 export default function BranchReportPage() {
+  const { branchParam } = useBranch()
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await api.get("/reports/branches")
+        const res = await api.get(withBranch("/reports/branches", branchParam))
         if (res.success) setData(res.data)
       } catch {
       } finally {
@@ -28,7 +30,7 @@ export default function BranchReportPage() {
       }
     }
     fetchData()
-  }, [])
+  }, [branchParam])
 
   return (
     <DashboardLayout breadcrumbs={[

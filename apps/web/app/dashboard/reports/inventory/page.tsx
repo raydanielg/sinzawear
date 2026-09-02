@@ -9,18 +9,20 @@ import { Skeleton } from "@workspace/ui/components/skeleton"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@workspace/ui/components/table"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Download04Icon, Package02Icon } from "@hugeicons/core-free-icons"
-import { api, formatTZS } from "@/lib/api"
+import { api, formatTZS, withBranch } from "@/lib/api"
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
+import { useBranch } from "@/lib/branch-context"
 
 export default function InventoryReportPage() {
+  const { branchParam } = useBranch()
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await api.get("/reports/inventory")
+        const res = await api.get(withBranch("/reports/inventory", branchParam))
         if (res.success) setData(res.data)
       } catch {
       } finally {
@@ -28,7 +30,7 @@ export default function InventoryReportPage() {
       }
     }
     fetchData()
-  }, [])
+  }, [branchParam])
 
   return (
     <DashboardLayout breadcrumbs={[

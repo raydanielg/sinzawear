@@ -9,10 +9,12 @@ import { Skeleton } from "@workspace/ui/components/skeleton"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@workspace/ui/components/table"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Search01Icon, ArrowMoveDownLeftIcon } from "@hugeicons/core-free-icons"
-import { api, formatDateTime } from "@/lib/api"
+import { api, formatDateTime, withBranch } from "@/lib/api"
 import type { StockMovement } from "@/lib/types"
+import { useBranch } from "@/lib/branch-context"
 
 export default function MovementsPage() {
+  const { branchParam } = useBranch()
   const [movements, setMovements] = useState<StockMovement[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
@@ -20,7 +22,7 @@ export default function MovementsPage() {
   useEffect(() => {
     async function fetchMovements() {
       try {
-        const res = await api.get("/inventory/movements")
+        const res = await api.get(withBranch("/inventory/movements", branchParam))
         if (res.success) setMovements(res.data.movements || [])
       } catch {
       } finally {
@@ -28,7 +30,7 @@ export default function MovementsPage() {
       }
     }
     fetchMovements()
-  }, [])
+  }, [branchParam])
 
   const filtered = movements.filter((m) => {
     const q = search.toLowerCase()

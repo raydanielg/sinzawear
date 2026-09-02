@@ -11,10 +11,12 @@ import { Skeleton } from "@workspace/ui/components/skeleton"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@workspace/ui/components/table"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { PlusIcon, PackageReceiveIcon, Search01Icon } from "@hugeicons/core-free-icons"
-import { api, formatTZS, formatDate } from "@/lib/api"
+import { api, formatTZS, formatDate, withBranch } from "@/lib/api"
 import type { Purchase } from "@/lib/types"
+import { useBranch } from "@/lib/branch-context"
 
 export default function PurchasesPage() {
+  const { branchParam } = useBranch()
   const [purchases, setPurchases] = useState<Purchase[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
@@ -22,7 +24,7 @@ export default function PurchasesPage() {
   useEffect(() => {
     async function fetchPurchases() {
       try {
-        const res = await api.get("/purchases")
+        const res = await api.get(withBranch("/purchases", branchParam))
         if (res.success) setPurchases(res.data.purchases || [])
       } catch {
       } finally {
@@ -30,7 +32,7 @@ export default function PurchasesPage() {
       }
     }
     fetchPurchases()
-  }, [])
+  }, [branchParam])
 
   const filtered = purchases.filter((p) => {
     const q = search.toLowerCase()
