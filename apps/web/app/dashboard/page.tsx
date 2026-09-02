@@ -27,6 +27,11 @@ import {
   TrendingDownIcon,
   Wallet01Icon,
   ReceiptIcon,
+  Add01Icon,
+  ArrowRight01Icon,
+  UserGroupIcon,
+  Store02Icon,
+  File02Icon,
 } from "@hugeicons/core-free-icons"
 import { api, formatTZS, formatDateTime } from "@/lib/api"
 import type { DashboardData, Sale, BranchStock } from "@/lib/types"
@@ -319,21 +324,41 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* Quick Actions - 2 column grid */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
-          <CardDescription>Common tasks</CardDescription>
-        </CardHeader>
-        <CardContent className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          <Link href="/dashboard/pos"><Button variant="outline" className="w-full justify-start"><HugeiconsIcon icon={Cash01Icon} strokeWidth={2} className="size-4" />New Sale (POS)</Button></Link>
-          <Link href="/dashboard/products/new"><Button variant="outline" className="w-full justify-start"><HugeiconsIcon icon={Shirt01Icon} strokeWidth={2} className="size-4" />Add Product</Button></Link>
-          <Link href="/dashboard/inventory"><Button variant="outline" className="w-full justify-start"><HugeiconsIcon icon={Package02Icon} strokeWidth={2} className="size-4" />Check Inventory</Button></Link>
-          <Link href="/dashboard/purchases/new"><Button variant="outline" className="w-full justify-start"><HugeiconsIcon icon={CoinsIcon} strokeWidth={2} className="size-4" />New Purchase</Button></Link>
-          <Link href="/dashboard/reports"><Button variant="outline" className="w-full justify-start"><HugeiconsIcon icon={ChartIcon} strokeWidth={2} className="size-4" />View Reports</Button></Link>
-          <Link href="/dashboard/customers"><Button variant="outline" className="w-full justify-start"><HugeiconsIcon icon={UsersIcon} strokeWidth={2} className="size-4" />Customers</Button></Link>
-        </CardContent>
-      </Card>
+      {/* Quick Actions */}
+      <div>
+        <div className="mb-4 flex items-center gap-2">
+          <div className="h-6 w-1 rounded-full bg-primary" />
+          <div>
+            <h2 className="text-lg font-bold tracking-tight">Quick Actions</h2>
+            <p className="text-sm text-muted-foreground">Jump straight to common tasks</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 lg:grid-cols-6">
+          {[
+            { label: "New Sale", desc: "Point of Sale", href: "/dashboard/pos", icon: Cash01Icon, color: "from-emerald-500 to-emerald-600", bg: "bg-emerald-50 dark:bg-emerald-950/40" },
+            { label: "Add Product", desc: "Create new item", href: "/dashboard/products/new", icon: Shirt01Icon, color: "from-blue-500 to-blue-600", bg: "bg-blue-50 dark:bg-blue-950/40" },
+            { label: "Inventory", desc: "Check stock levels", href: "/dashboard/inventory", icon: Package02Icon, color: "from-amber-500 to-amber-600", bg: "bg-amber-50 dark:bg-amber-950/40" },
+            { label: "New Purchase", desc: "Record purchase", href: "/dashboard/purchases/new", icon: CoinsIcon, color: "from-violet-500 to-violet-600", bg: "bg-violet-50 dark:bg-violet-950/40" },
+            { label: "Reports", desc: "View analytics", href: "/dashboard/reports", icon: ChartIcon, color: "from-rose-500 to-rose-600", bg: "bg-rose-50 dark:bg-rose-950/40" },
+            { label: "Customers", desc: "Manage profiles", href: "/dashboard/customers", icon: UsersIcon, color: "from-cyan-500 to-cyan-600", bg: "bg-cyan-50 dark:bg-cyan-950/40" },
+          ].map((action) => (
+            <Link key={action.href} href={action.href}>
+              <div className={cn("group relative flex flex-col gap-3 rounded-xl border p-4 transition-all hover:shadow-md hover:-translate-y-0.5 cursor-pointer overflow-hidden", action.bg)}>
+                <div className={cn("flex size-11 items-center justify-center rounded-lg bg-gradient-to-br text-white shadow-sm", action.color)}>
+                  <HugeiconsIcon icon={action.icon} strokeWidth={2} className="size-6" />
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-sm font-semibold leading-tight">{action.label}</span>
+                  <span className="text-xs text-muted-foreground leading-tight">{action.desc}</span>
+                </div>
+                <div className="absolute right-3 top-3 opacity-0 transition-opacity group-hover:opacity-100">
+                  <HugeiconsIcon icon={ArrowRight01Icon} strokeWidth={2} className="size-4 text-muted-foreground" />
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
     </DashboardLayout>
   )
 }
