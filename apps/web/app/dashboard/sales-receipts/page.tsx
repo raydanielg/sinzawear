@@ -51,13 +51,13 @@ export default function SalesReceiptsPage() {
 
   return (
     <DashboardLayout breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Sales Receipts" }]}>
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Sales Receipts</h1>
           <p className="text-sm text-muted-foreground">View all completed sales receipts</p>
         </div>
         <Link href="/dashboard/pos">
-          <Button className="gap-2">
+          <Button className="w-full gap-2 sm:w-auto">
             <HugeiconsIcon icon={ReceiptIcon} strokeWidth={2} className="size-4" /> New Sale
           </Button>
         </Link>

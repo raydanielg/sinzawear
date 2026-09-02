@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@workspace/ui/components/card"
 import { Button } from "@workspace/ui/components/button"
@@ -43,7 +44,7 @@ const settingTabs = [
   { label: "Manage Stations/Branches", icon: BuildingIcon, href: "/dashboard/branches" },
   { label: "Manage Currency", icon: CoinsIcon },
   { label: "Manage Users", icon: UsersIcon, href: "/dashboard/users" },
-  { label: "Roles & Permissions", icon: ShieldCheckIcon, href: "/dashboard/settings/roles" },
+  { label: "Roles & Permissions", icon: ShieldCheckIcon, href: "/dashboard/roles" },
   { label: "Manage Designation", icon: UserGroupIcon },
   { label: "Manage Department/Units", icon: UserGroupIcon, href: "/dashboard/hr/departments" },
   { label: "Code Values", icon: File02Icon },
@@ -99,6 +100,7 @@ const categoryButtons = [
 ]
 
 export default function SettingsPage() {
+  const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [activeTab, setActiveTab] = useState("System Definitions")
@@ -220,7 +222,7 @@ export default function SettingsPage() {
       <div className="flex flex-col gap-4 lg:flex-row">
         {/* Left Vertical Tabs */}
         <div className="w-full lg:w-56 shrink-0">
-          <div className="flex flex-col gap-0.5 rounded-lg border bg-card p-2">
+          <div className="flex gap-1 overflow-x-auto pb-1 lg:flex-col lg:gap-0.5 lg:overflow-visible lg:pb-0 rounded-lg border bg-card p-2">
             {settingTabs.map((tab) => {
               const isActive = activeTab === tab.label
               return (
@@ -229,10 +231,10 @@ export default function SettingsPage() {
                   onClick={() => {
                     setActiveTab(tab.label)
                     if (tab.href && tab.href !== "/dashboard/settings") {
-                      window.location.href = tab.href
+                      router.push(tab.href)
                     }
                   }}
-                  className={`flex items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
                     isActive
                       ? "bg-primary text-primary-foreground"
                       : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -292,7 +294,7 @@ export default function SettingsPage() {
                         filteredItems.map((item) => (
                           <div
                             key={item.id}
-                            className="flex items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-muted/30"
+                            className="flex flex-col gap-2 rounded-lg border p-3 transition-colors hover:bg-muted/30 sm:flex-row sm:items-center sm:gap-3"
                           >
                             <div className="flex-1">
                               <p className="text-sm font-medium leading-snug">{item.label}</p>
@@ -302,11 +304,20 @@ export default function SettingsPage() {
                                 </Badge>
                               )}
                             </div>
-                            <div className="w-32 text-center">{renderValue(item)}</div>
+                            <div className="flex items-center gap-2 sm:w-32 sm:justify-center">{renderValue(item)}
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 sm:hidden"
+                                onClick={() => openEdit(item)}
+                              >
+                                <HugeiconsIcon icon={Edit02Icon} strokeWidth={2} className="size-4" />
+                              </Button>
+                            </div>
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-8 w-8 p-0"
+                              className="hidden h-8 w-8 p-0 sm:flex"
                               onClick={() => openEdit(item)}
                             >
                               <HugeiconsIcon icon={Edit02Icon} strokeWidth={2} className="size-4" />

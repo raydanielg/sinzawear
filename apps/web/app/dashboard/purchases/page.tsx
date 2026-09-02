@@ -58,7 +58,7 @@ export default function PurchasesPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <CardTitle>All Purchases</CardTitle>
               <CardDescription>Goods received notes and supplier invoices</CardDescription>

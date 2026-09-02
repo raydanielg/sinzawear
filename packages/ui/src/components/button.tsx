@@ -1,3 +1,4 @@
+import * as React from "react"
 import { Button as ButtonPrimitive } from "@base-ui/react/button"
 import { cva, type VariantProps } from "class-variance-authority"
 import { HugeiconsIcon } from "@hugeicons/react"
@@ -42,7 +43,9 @@ const buttonVariants = cva(
   }
 )
 
-function Button({
+const Button = React.forwardRef<HTMLElement, ButtonPrimitive.Props & VariantProps<typeof buttonVariants> & {
+  loading?: boolean
+}>(function Button({
   className,
   variant = "default",
   size = "default",
@@ -50,11 +53,10 @@ function Button({
   disabled,
   children,
   ...props
-}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants> & {
-  loading?: boolean
-}) {
+}, ref) {
   return (
     <ButtonPrimitive
+      ref={ref}
       data-slot="button"
       data-loading={loading || undefined}
       className={cn(
@@ -74,6 +76,6 @@ function Button({
       {children}
     </ButtonPrimitive>
   )
-}
+})
 
 export { Button, buttonVariants }

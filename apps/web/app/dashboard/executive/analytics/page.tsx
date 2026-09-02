@@ -105,12 +105,12 @@ export default function ExecutiveAnalyticsPage() {
       { label: "Dashboard", href: "/dashboard" },
       { label: "Executive Analytics" },
     ]}>
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Executive Analytics</h1>
           <p className="text-sm text-muted-foreground">Financial statistics and performance overview</p>
         </div>
-        <Button variant="outline" size="sm" onClick={handleRefresh} disabled={refreshing} className="gap-2">
+        <Button variant="outline" size="sm" onClick={handleRefresh} disabled={refreshing} className="w-full gap-2 sm:w-auto">
           <HugeiconsIcon icon={RefreshIcon} strokeWidth={2} className={`size-4 ${refreshing ? "animate-spin" : ""}`} />
           Refresh Data
         </Button>
@@ -122,7 +122,7 @@ export default function ExecutiveAnalyticsPage() {
           <div className="space-y-1">
             <label className="text-xs text-muted-foreground">Financial Year</label>
             <Select value={year} onValueChange={(v) => setYear(v ?? String(currentYear))}>
-              <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="w-full sm:w-40"><SelectValue /></SelectTrigger>
               <SelectContent>
                 {years.map((y) => (
                   <SelectItem key={y} value={y}>{y}</SelectItem>
@@ -134,7 +134,7 @@ export default function ExecutiveAnalyticsPage() {
           <div className="space-y-1">
             <label className="text-xs text-muted-foreground">Station</label>
             <Select value={station} onValueChange={(v) => setStation(v ?? "all")}>
-              <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="w-full sm:w-48"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All</SelectItem>
                 {branches.map((b) => (

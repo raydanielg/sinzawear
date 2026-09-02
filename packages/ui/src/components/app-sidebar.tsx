@@ -243,7 +243,7 @@ const data = {
       items: [
         { title: "Branches", url: "/dashboard/branches" },
         { title: "Users", url: "/dashboard/users" },
-        { title: "Roles & Permissions", url: "/dashboard/settings/roles" },
+        { title: "Roles & Permissions", url: "/dashboard/roles" },
         { title: "Audit Logs", url: "/dashboard/audit-logs" },
       ],
     },
@@ -256,7 +256,7 @@ const data = {
       items: [
         { title: "System Definitions", url: "/dashboard/settings" },
         { title: "Business Info", url: "/dashboard/settings" },
-        { title: "Roles", url: "/dashboard/settings/roles" },
+        { title: "Roles", url: "/dashboard/roles" },
       ],
     },
   ],

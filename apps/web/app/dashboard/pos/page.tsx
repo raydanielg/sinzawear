@@ -35,7 +35,7 @@ const PAYMENT_METHODS = [
 ]
 
 export default function POSPage() {
-  const { branchParam } = useBranch()
+  const { branchParam, selectedBranch } = useBranch()
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
@@ -121,6 +121,7 @@ export default function POSPage() {
         items: cart.map((item) => ({ variantId: item.variantId, quantity: item.quantity })),
         payments: [{ method: paymentMethod, amount: total }],
         discount,
+        branchId: selectedBranch !== "all" ? selectedBranch : undefined,
       })
       if (res.success) {
         toast.success("Sale completed!", { description: `Receipt: ${res.data.sale.saleNumber}` })

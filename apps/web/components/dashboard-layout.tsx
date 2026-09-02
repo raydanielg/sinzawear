@@ -54,12 +54,15 @@ import {
   ArrowDataTransferHorizontalIcon,
   BanknoteIcon,
   ArrowLeftRightIcon,
+  Sun02Icon,
+  Moon02Icon,
 } from "@hugeicons/core-free-icons"
 import { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { api, getUser, clearAuth } from "@/lib/api"
 import { useBranch } from "@/lib/branch-context"
+import { useTheme } from "next-themes"
 
 interface DashboardLayoutProps {
   children: React.ReactNode
@@ -69,6 +72,10 @@ interface DashboardLayoutProps {
 function DashboardInner({ children, breadcrumbs }: DashboardLayoutProps) {
   const router = useRouter()
   const { selectedBranch, setSelectedBranch, branches, setBranches } = useBranch()
+  const { resolvedTheme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => { setMounted(true) }, [])
   const [user, setUser] = useState<{ name: string; email: string; roles?: string[] } | null>(null)
   const [notifications, setNotifications] = useState<{ id: string; title: string; message: string; isRead: boolean }[]>([])
   const [searchQuery, setSearchQuery] = useState("")
@@ -133,7 +140,7 @@ function DashboardInner({ children, breadcrumbs }: DashboardLayoutProps) {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-3 sm:px-4">
+        <header className="flex h-16 shrink-0 items-center gap-1 sm:gap-2 border-b px-2 sm:px-4">
           <SidebarTrigger className="-ms-1" />
           <Separator orientation="vertical" className="me-2 data-vertical:h-4 data-vertical:self-auto" />
           <Breadcrumb>
@@ -153,12 +160,12 @@ function DashboardInner({ children, breadcrumbs }: DashboardLayoutProps) {
             </BreadcrumbList>
           </Breadcrumb>
 
-          <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
+          <div className="ml-auto flex items-center gap-1 sm:gap-1.5 lg:gap-2">
             <div ref={searchRef} className="relative hidden lg:block">
               <HugeiconsIcon icon={Search01Icon} strokeWidth={2} className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               <Input placeholder="Search products, customers..." className="h-9 w-48 pl-8 lg:w-64" value={searchQuery} onChange={(e) => { setSearchQuery(e.target.value); setSearchOpen(true) }} onFocus={() => setSearchOpen(true)} />
               {searchOpen && searchQuery.trim() && (
-                <div className="absolute top-full mt-1 w-80 rounded-md border bg-popover shadow-md z-50 max-h-96 overflow-y-auto">
+                <div className="absolute top-full mt-1 w-72 sm:w-80 rounded-md border bg-popover shadow-md z-50 max-h-96 overflow-y-auto">
                   {searchLoading ? (
                     <div className="p-4 text-center text-sm text-muted-foreground">Searching...</div>
                   ) : searchResults.products.length === 0 && searchResults.customers.length === 0 ? (
@@ -196,6 +203,20 @@ function DashboardInner({ children, breadcrumbs }: DashboardLayoutProps) {
                 </div>
               )}
             </div>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-8"
+              onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+              aria-label="Toggle theme"
+            >
+              {mounted && resolvedTheme === "dark" ? (
+                <HugeiconsIcon icon={Sun02Icon} strokeWidth={2} className="size-5" />
+              ) : (
+                <HugeiconsIcon icon={Moon02Icon} strokeWidth={2} className="size-5" />
+              )}
+            </Button>
 
             <DropdownMenu>
               <DropdownMenuTrigger render={<Button variant="outline" size="sm" className="gap-2" />}>
@@ -299,7 +320,7 @@ function DashboardInner({ children, breadcrumbs }: DashboardLayoutProps) {
                     </Badge>
                   )}
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-80">
+              <DropdownMenuContent align="end" className="w-72 sm:w-80">
                 <DropdownMenuLabel>Notifications</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {notifications.length === 0 ? (

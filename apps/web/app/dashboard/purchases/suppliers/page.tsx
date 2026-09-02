@@ -43,12 +43,12 @@ export default function SuppliersPage() {
 
   return (
     <DashboardLayout breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Purchasing", href: "/dashboard/purchases" }, { label: "Suppliers" }]}>
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Suppliers</h1>
           <p className="text-sm text-muted-foreground">Manage your suppliers and track balances</p>
         </div>
-        <Button>
+        <Button className="w-full sm:w-auto">
           <HugeiconsIcon icon={PlusIcon} strokeWidth={2} className="size-4" />
           Add Supplier
         </Button>

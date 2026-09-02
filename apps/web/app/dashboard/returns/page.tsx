@@ -57,14 +57,14 @@ export default function ReturnsPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <CardTitle>All Returns</CardTitle>
               <CardDescription>Return and refund history</CardDescription>
             </div>
-            <div className="relative">
+            <div className="relative w-full sm:w-48">
               <HugeiconsIcon icon={Search01Icon} strokeWidth={2} className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input placeholder="Search receipt..." value={search} onChange={(e) => setSearch(e.target.value)} className="h-9 w-48 pl-8" />
+              <Input placeholder="Search receipt..." value={search} onChange={(e) => setSearch(e.target.value)} className="h-9 w-full pl-8" />
             </div>
           </div>
         </CardHeader>

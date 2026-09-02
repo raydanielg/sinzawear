@@ -175,14 +175,14 @@ export default function BankingPage() {
     return (
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <CardTitle>{sectionTitle}: TZS</CardTitle>
               <CardDescription>
                 Total Balance: {renderBalance(section.totalBalance)}
               </CardDescription>
             </div>
-            <Button variant="outline" size="sm" onClick={handleRefresh} disabled={refreshing} className="gap-2">
+            <Button variant="outline" size="sm" onClick={handleRefresh} disabled={refreshing} className="w-full gap-2 sm:w-auto">
               <HugeiconsIcon icon={RefreshIcon} strokeWidth={2} className={`size-4 ${refreshing ? "animate-spin" : ""}`} />
               Refresh Balance
             </Button>
@@ -242,14 +242,14 @@ export default function BankingPage() {
           <h1 className="text-2xl font-bold tracking-tight">Banking & Cash Management</h1>
           <p className="text-sm text-muted-foreground">Bank accounts, cash on hand, and petty cash balances</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row">
           <Link href="/dashboard/transactions/fund-transfer">
-            <Button variant="outline" className="gap-2">
+            <Button variant="outline" className="w-full gap-2 sm:w-auto">
               <HugeiconsIcon icon={ArrowDataTransferHorizontalIcon} strokeWidth={2} className="size-4" />
               Fund Transfer
             </Button>
           </Link>
-          <Button onClick={() => openAdd()} className="gap-2">
+          <Button onClick={() => openAdd()} className="w-full gap-2 sm:w-auto">
             <HugeiconsIcon icon={PlusIcon} strokeWidth={2} className="size-4" />
             Add Account
           </Button>
@@ -262,7 +262,7 @@ export default function BankingPage() {
           <div className="space-y-1">
             <label className="text-xs text-muted-foreground">Station</label>
             <Select value={station} onValueChange={(v) => setStation(v ?? "all")}>
-              <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="w-full sm:w-48"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All</SelectItem>
                 {branches.map((b) => (
@@ -283,7 +283,7 @@ export default function BankingPage() {
       </Card>
 
       {/* Summary Cards */}
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-3">
         <Card className="border-blue-500/30">
           <CardContent className="flex items-center justify-between p-5">
             <div className="flex flex-col gap-1">
@@ -332,14 +332,14 @@ export default function BankingPage() {
       {data?.cashOnHand && (
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <CardTitle>Cash on Hand: TZS</CardTitle>
                 <CardDescription>
                   Total Balance: {renderBalance(data.cashOnHand.totalBalance)}
                 </CardDescription>
               </div>
-              <Button variant="outline" size="sm" onClick={handleRefresh} disabled={refreshing} className="gap-2">
+              <Button variant="outline" size="sm" onClick={handleRefresh} disabled={refreshing} className="w-full gap-2 sm:w-auto">
                 <HugeiconsIcon icon={RefreshIcon} strokeWidth={2} className={`size-4 ${refreshing ? "animate-spin" : ""}`} />
                 Refresh Balance
               </Button>
@@ -517,15 +517,15 @@ function SectionRows({
           <TableCell className="text-muted-foreground">{parent.name}</TableCell>
           <TableCell>{renderBalanceValue(child.balance)}</TableCell>
           <TableCell>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-1">
             <Button variant="link" size="sm" className="h-auto p-0 text-blue-600" onClick={() => onEdit(child)}>
               Edit
             </Button>
-            <span className="text-muted-foreground">|</span>
+            <span className="text-muted-foreground hidden sm:inline">|</span>
             <Button variant="link" size="sm" className="h-auto p-0 text-muted-foreground" disabled>
               Statement
             </Button>
-            <span className="text-muted-foreground">|</span>
+            <span className="text-muted-foreground hidden sm:inline">|</span>
             <Button variant="link" size="sm" className="h-auto p-0 text-muted-foreground" disabled>
               Reconcile
             </Button>

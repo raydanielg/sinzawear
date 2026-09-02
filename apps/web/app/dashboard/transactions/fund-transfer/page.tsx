@@ -96,9 +96,9 @@ export default function FundTransferPage() {
     <DashboardLayout breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Transactions", href: "/dashboard/transactions" }, { label: "Fund Transfer" }]}>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div><h1 className="text-2xl font-bold tracking-tight">Fund Transfers</h1><p className="text-sm text-muted-foreground">Transfer funds between accounts</p></div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={exportPDF} disabled={loading || filtered.length === 0} className="gap-2"><HugeiconsIcon icon={Download04Icon} strokeWidth={2} className="size-4" /> Export</Button>
-          <Button onClick={() => setSheetOpen(true)} className="gap-2"><HugeiconsIcon icon={PlusIcon} strokeWidth={2} className="size-4" /> New Transfer</Button>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Button variant="outline" onClick={exportPDF} disabled={loading || filtered.length === 0} className="w-full gap-2 sm:w-auto"><HugeiconsIcon icon={Download04Icon} strokeWidth={2} className="size-4" /> Export</Button>
+          <Button onClick={() => setSheetOpen(true)} className="w-full gap-2 sm:w-auto"><HugeiconsIcon icon={PlusIcon} strokeWidth={2} className="size-4" /> New Transfer</Button>
         </div>
       </div>
 
