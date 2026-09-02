@@ -5,7 +5,7 @@ export default function AuthPage() {
   return (
     <div className="relative flex min-h-svh items-center justify-center p-6">
       <img
-        src="/assets/41714.jpg"
+        src="/assets/5301.jpg"
         alt="Sinza Classic Wear"
         className="absolute inset-0 h-full w-full object-cover"
       />

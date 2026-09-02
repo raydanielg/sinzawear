@@ -196,9 +196,9 @@ export default function SettingsPage() {
   }
 
   const currentCategory = categories.find((c) => c.id === activeCategory) || categories[0]
-  const filteredItems = currentCategory.items.filter((item) =>
-    item.label.toLowerCase().includes(search.toLowerCase())
-  )
+  const filteredItems = currentCategory?.items?.filter((item) =>
+    item.label?.toLowerCase().includes(search?.toLowerCase())
+  ) || []
 
   if (loading) {
     return (
@@ -275,7 +275,7 @@ export default function SettingsPage() {
                 <Card>
                   <CardContent className="p-5">
                     <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <h3 className="text-lg font-bold">{currentCategory.name}</h3>
+                      <h3 className="text-lg font-bold">{currentCategory?.name}</h3>
                       <div className="relative w-full sm:w-64">
                         <HugeiconsIcon icon={Search01Icon} strokeWidth={2} className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                         <Input
