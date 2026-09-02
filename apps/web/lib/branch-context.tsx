@@ -19,6 +19,14 @@ export function BranchProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const stored = localStorage.getItem("selectedBranch")
     if (stored) setSelectedBranchState(stored)
+
+    function syncBranch() {
+      const v = localStorage.getItem("selectedBranch")
+      if (v) setSelectedBranchState(v)
+      else setSelectedBranchState("all")
+    }
+    window.addEventListener("branchChanged", syncBranch)
+    return () => window.removeEventListener("branchChanged", syncBranch)
   }, [])
 
   function setSelectedBranch(id: string) {

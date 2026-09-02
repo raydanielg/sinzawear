@@ -6,6 +6,7 @@ import { NavMain } from "@workspace/ui/components/nav-main"
 import { NavProjects } from "@workspace/ui/components/nav-projects"
 import { NavUser } from "@workspace/ui/components/nav-user"
 import { TeamSwitcher } from "@workspace/ui/components/team-switcher"
+import { BranchSwitcher } from "@workspace/ui/components/branch-switcher"
 import {
   Sidebar,
   SidebarContent,
@@ -44,16 +45,10 @@ import {
   ClipboardListIcon,
   BoxesIcon,
   CalendarIcon,
-  MoneyCheckIcon,
-  Bell01Icon,
   ShoppingCart01Icon,
   CreditCardIcon,
   CarIcon,
-  PalletIcon,
   CubeIcon,
-  FileAltIcon,
-  DesktopIcon,
-  TaxIcon,
   BuildingIcon,
 } from "@hugeicons/core-free-icons"
 
@@ -368,6 +363,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     email: "user@sinza.co.tz",
     avatar: "",
   })
+  const [branches, setBranches] = React.useState<{ id: string; name: string; code?: string }[]>([])
+  const [selectedBranch, setSelectedBranch] = React.useState<string>("all")
+  const [companies, setCompanies] = React.useState<{ id: string; name: string; plan: string }[]>([])
+  const [activeCompanyId, setActiveCompanyId] = React.useState<string | undefined>()
 
   React.useEffect(() => {
     if (typeof window !== "undefined") {
@@ -382,19 +381,63 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           })
         } catch {}
       }
+      const storedBranch = localStorage.getItem("selectedBranch")
+      if (storedBranch) setSelectedBranch(storedBranch)
     }
   }, [])
+
+  React.useEffect(() => {
+    async function fetchMeta() {
+      try {
+        const token = localStorage.getItem("token")
+        if (!token) return
+        const headers = { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }
+        const [branchRes, companyRes] = await Promise.all([
+          fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://178-104-240-146.sslip.io/api/v1"}/branches`, { headers }).then(r => r.json()).catch(() => ({ success: false })),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://178-104-240-146.sslip.io/api/v1"}/company`, { headers }).then(r => r.json()).catch(() => ({ success: false })),
+        ])
+        if (branchRes.success) setBranches(branchRes.data.branches || [])
+        if (companyRes.success && companyRes.data) {
+          const c = companyRes.data
+          setCompanies([{ id: c.id, name: c.name || "Sinza Fashion", plan: c.industry || "Retail Management" }])
+          setActiveCompanyId(c.id)
+        }
+      } catch {}
+    }
+    fetchMeta()
+  }, [])
+
+  function handleSelectBranch(id: string) {
+    setSelectedBranch(id)
+    if (typeof window !== "undefined") {
+      localStorage.setItem("selectedBranch", id)
+      window.dispatchEvent(new Event("branchChanged"))
+    }
+  }
+
+  const teams = companies.length > 0 ? companies : data.teams.map((t) => ({ ...t, id: "default" }))
 
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <TeamSwitcher
+          teams={teams}
+          activeTeamId={activeCompanyId}
+          onSelectTeam={setActiveCompanyId}
+          onAddTeam={() => { if (typeof window !== "undefined") window.location.href = "/dashboard/settings" }}
+        />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
+        <BranchSwitcher
+          branches={branches}
+          selectedBranch={selectedBranch}
+          onSelectBranch={handleSelectBranch}
+          onAddBranch={() => { if (typeof window !== "undefined") window.location.href = "/dashboard/branches" }}
+        />
         <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />

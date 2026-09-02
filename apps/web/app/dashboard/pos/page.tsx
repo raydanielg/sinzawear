@@ -35,7 +35,7 @@ const PAYMENT_METHODS = [
 ]
 
 export default function POSPage() {
-  const { branchParam, selectedBranch } = useBranch()
+  const { branchParam, selectedBranch, branches } = useBranch()
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
@@ -115,13 +115,18 @@ export default function POSPage() {
 
   async function completeSale() {
     if (cart.length === 0) return
+    const branchId = selectedBranch !== "all" ? selectedBranch : branches[0]?.id
+    if (!branchId) {
+      toast.error("Please select a branch before completing the sale")
+      return
+    }
     setProcessing(true)
     try {
       const res = await api.post("/sales", {
         items: cart.map((item) => ({ variantId: item.variantId, quantity: item.quantity })),
         payments: [{ method: paymentMethod, amount: total }],
         discount,
-        branchId: selectedBranch !== "all" ? selectedBranch : undefined,
+        branchId,
       })
       if (res.success) {
         toast.success("Sale completed!", { description: `Receipt: ${res.data.sale.saleNumber}` })

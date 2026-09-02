@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,42 +17,23 @@ import {
   useSidebar,
 } from "@workspace/ui/components/sidebar"
 import { HugeiconsIcon } from "@hugeicons/react"
-import { UnfoldMoreIcon, PlusSignIcon, BuildingIcon } from "@hugeicons/core-free-icons"
+import { Store02Icon, UnfoldMoreIcon, PlusSignIcon, CheckmarkCircle02Icon } from "@hugeicons/core-free-icons"
 
-export function TeamSwitcher({
-  teams,
-  activeTeamId,
-  onSelectTeam,
-  onAddTeam,
+export function BranchSwitcher({
+  branches,
+  selectedBranch,
+  onSelectBranch,
+  onAddBranch,
 }: {
-  teams: {
-    id: string
-    name: string
-    logo?: React.ReactNode
-    plan: string
-  }[]
-  activeTeamId?: string
-  onSelectTeam?: (id: string) => void
-  onAddTeam?: () => void
+  branches: { id: string; name: string; code?: string }[]
+  selectedBranch: string
+  onSelectBranch: (id: string) => void
+  onAddBranch?: () => void
 }) {
   const { isMobile } = useSidebar()
-  const [internalActive, setInternalActive] = React.useState(teams[0])
-
-  const activeTeam = activeTeamId
-    ? teams.find((t) => t.id === activeTeamId) || internalActive
-    : internalActive
-
-  if (!activeTeam) {
-    return null
-  }
-
-  function handleSelect(id: string) {
-    const team = teams.find((t) => t.id === id)
-    if (team) {
-      setInternalActive(team)
-      onSelectTeam?.(id)
-    }
-  }
+  const activeBranch = selectedBranch === "all"
+    ? null
+    : branches.find((b) => b.id === selectedBranch)
 
   return (
     <SidebarMenu>
@@ -68,11 +48,13 @@ export function TeamSwitcher({
             }
           >
             <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-              {activeTeam.logo || <HugeiconsIcon icon={BuildingIcon} strokeWidth={2} className="size-4" />}
+              <HugeiconsIcon icon={Store02Icon} strokeWidth={2} className="size-4" />
             </div>
             <div className="grid flex-1 text-start text-sm leading-tight">
-              <span className="truncate font-medium">{activeTeam.name}</span>
-              <span className="truncate text-xs">{activeTeam.plan}</span>
+              <span className="truncate font-medium">{activeBranch ? activeBranch.name : "All Branches"}</span>
+              <span className="truncate text-xs text-muted-foreground">
+                {activeBranch?.code ? activeBranch.code : `${branches.length} branch(es)`}
+              </span>
             </div>
             <HugeiconsIcon icon={UnfoldMoreIcon} strokeWidth={2} className="ms-auto" />
           </DropdownMenuTrigger>
@@ -84,34 +66,46 @@ export function TeamSwitcher({
           >
             <DropdownMenuGroup>
               <DropdownMenuLabel className="text-xs text-muted-foreground">
-                Businesses
+                Branches
               </DropdownMenuLabel>
-              {teams.map((team) => (
+              <DropdownMenuItem
+                onClick={() => onSelectBranch("all")}
+                className="gap-2 p-2"
+              >
+                <div className="flex size-6 items-center justify-center rounded-md border">
+                  <HugeiconsIcon icon={Store02Icon} strokeWidth={2} className="size-4" />
+                </div>
+                All Branches
+                {selectedBranch === "all" && (
+                  <HugeiconsIcon icon={CheckmarkCircle02Icon} strokeWidth={2} className="ms-auto size-4 text-primary" />
+                )}
+              </DropdownMenuItem>
+              {branches.map((branch) => (
                 <DropdownMenuItem
-                  key={team.id || team.name}
-                  onClick={() => handleSelect(team.id)}
+                  key={branch.id}
+                  onClick={() => onSelectBranch(branch.id)}
                   className="gap-2 p-2"
                 >
                   <div className="flex size-6 items-center justify-center rounded-md border">
-                    {team.logo || <HugeiconsIcon icon={BuildingIcon} strokeWidth={2} className="size-4" />}
+                    <HugeiconsIcon icon={Store02Icon} strokeWidth={2} className="size-4" />
                   </div>
-                  {team.name}
-                  {activeTeam.id === team.id && (
-                    <span className="ms-auto text-xs text-primary">active</span>
+                  {branch.name}
+                  {selectedBranch === branch.id && (
+                    <HugeiconsIcon icon={CheckmarkCircle02Icon} strokeWidth={2} className="ms-auto size-4 text-primary" />
                   )}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuGroup>
-            {onAddTeam && (
+            {onAddBranch && (
               <>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem className="gap-2 p-2" onClick={onAddTeam}>
+                  <DropdownMenuItem className="gap-2 p-2" onClick={onAddBranch}>
                     <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
                       <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2} className="size-4" />
                     </div>
                     <div className="font-medium text-muted-foreground">
-                      Add Business
+                      Add Branch
                     </div>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
