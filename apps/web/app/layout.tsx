@@ -11,9 +11,9 @@ export const metadata: Metadata = {
   title: "Sinza Classic Wear",
   description: "Classic style, timeless elegance. Premium fashion for the modern individual.",
   icons: {
-    icon: "/assets/social-media (1).png",
-    shortcut: "/assets/social-media (1).png",
-    apple: "/assets/social-media (1).png",
+    icon: "/assets/SC-logo.svg",
+    shortcut: "/assets/SC-logo.svg",
+    apple: "/assets/SC-logo.svg",
   },
 }
 

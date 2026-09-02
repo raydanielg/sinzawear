@@ -234,10 +234,10 @@ export default function SettingsPage() {
                       router.push(tab.href)
                     }
                   }}
-                  className={`flex items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
+                  className={`flex items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium whitespace-nowrap shrink-0 transition-all duration-200 ${
                     isActive
-                      ? "bg-primary text-primary-foreground"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                      ? "bg-primary text-primary-foreground shadow-md"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground hover:shadow-sm hover:translate-x-1 active:scale-95"
                   }`}
                 >
                   {tab.icon && <HugeiconsIcon icon={tab.icon} strokeWidth={2} className="size-4 shrink-0" />}
@@ -258,10 +258,10 @@ export default function SettingsPage() {
                   <button
                     key={cat.id}
                     onClick={() => setActiveCategory(cat.id)}
-                    className={`flex items-center gap-2 rounded-md px-3 py-2 text-left text-xs font-medium transition-colors w-full ${
+                    className={`flex items-center gap-2 rounded-md px-3 py-2 text-left text-xs font-medium w-full transition-all duration-200 ${
                       activeCategory === cat.id
-                        ? "bg-muted text-foreground"
-                        : "text-muted-foreground hover:bg-muted/50"
+                        ? "bg-muted text-foreground shadow-sm"
+                        : "text-muted-foreground hover:bg-muted/50 hover:text-foreground hover:shadow-sm hover:translate-x-1 active:scale-95"
                     }`}
                   >
                     {cat.icon && <HugeiconsIcon icon={cat.icon} strokeWidth={2} className="size-3.5 shrink-0" />}
@@ -294,7 +294,7 @@ export default function SettingsPage() {
                         filteredItems.map((item) => (
                           <div
                             key={item.id}
-                            className="flex flex-col gap-2 rounded-lg border p-3 transition-colors hover:bg-muted/30 sm:flex-row sm:items-center sm:gap-3"
+                            className="flex flex-col gap-2 rounded-lg border p-3 transition-all duration-200 hover:bg-muted/40 hover:shadow-md hover:border-primary/30 sm:flex-row sm:items-center sm:gap-3 active:scale-[0.98]"
                           >
                             <div className="flex-1">
                               <p className="text-sm font-medium leading-snug">{item.label}</p>
@@ -308,7 +308,7 @@ export default function SettingsPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 w-8 p-0 sm:hidden"
+                                className="h-8 w-8 p-0 transition-all duration-200 hover:scale-110 hover:bg-primary/10 hover:text-primary active:scale-90 sm:hidden"
                                 onClick={() => openEdit(item)}
                               >
                                 <HugeiconsIcon icon={Edit02Icon} strokeWidth={2} className="size-4" />
@@ -317,7 +317,7 @@ export default function SettingsPage() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="hidden h-8 w-8 p-0 sm:flex"
+                              className="hidden h-8 w-8 p-0 transition-all duration-200 hover:scale-110 hover:bg-primary/10 hover:text-primary active:scale-90 sm:flex"
                               onClick={() => openEdit(item)}
                             >
                               <HugeiconsIcon icon={Edit02Icon} strokeWidth={2} className="size-4" />
@@ -355,7 +355,7 @@ export default function SettingsPage() {
                       <Label>Address</Label>
                       <Textarea value={business.address} onChange={(e) => setBusiness({ ...business, address: e.target.value })} placeholder="Dar es Salaam, Tanzania" rows={2} />
                     </div>
-                    <Button type="submit" disabled={saving}>{saving ? "Saving..." : "Save Changes"}</Button>
+                    <Button type="submit" disabled={saving} className="transition-all duration-200 hover:shadow-lg hover:scale-105 active:scale-95">{saving ? "Saving..." : "Save Changes"}</Button>
                   </form>
                 </CardContent>
               </Card>
@@ -395,7 +395,7 @@ export default function SettingsPage() {
                       <Label>Loyalty Points Rate (per TZS spent)</Label>
                       <Input type="number" value={system.loyaltyRate} onChange={(e) => setSystem({ ...system, loyaltyRate: e.target.value })} />
                     </div>
-                    <Button type="submit" disabled={saving}>{saving ? "Saving..." : "Save Settings"}</Button>
+                    <Button type="submit" disabled={saving} className="transition-all duration-200 hover:shadow-lg hover:scale-105 active:scale-95">{saving ? "Saving..." : "Save Settings"}</Button>
                   </form>
                 </CardContent>
               </Card>
@@ -429,8 +429,8 @@ export default function SettingsPage() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditItem(null)}>Cancel</Button>
-            <Button onClick={handleSaveEdit}>Save</Button>
+            <Button variant="outline" className="transition-all duration-200 hover:shadow-md hover:scale-105 active:scale-95" onClick={() => setEditItem(null)}>Cancel</Button>
+            <Button className="transition-all duration-200 hover:shadow-lg hover:scale-105 active:scale-95" onClick={handleSaveEdit}>Save</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

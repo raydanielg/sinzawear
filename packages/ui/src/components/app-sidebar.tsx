@@ -58,7 +58,7 @@ const data = {
       name: "Sinza Fashion",
       logo: (
         <img
-          src="/assets/social-media.png"
+          src="/assets/SC-logo.svg"
           alt="Sinza"
           className="size-5 rounded-sm object-cover"
         />

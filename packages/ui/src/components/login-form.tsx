@@ -73,7 +73,7 @@ export function LoginForm({
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
                 <img
-                  src="/assets/social-media.png"
+                  src="/assets/SC-logo.svg"
                   alt="Sinza Classic Wear"
                   className="size-16 object-contain"
                 />
