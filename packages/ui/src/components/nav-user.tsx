@@ -52,7 +52,7 @@ export function NavUser({
       localStorage.removeItem("token")
       localStorage.removeItem("user")
       localStorage.removeItem("selectedBranch")
-      window.location.href = "/login"
+      window.location.href = "/auth"
     }
   }
 
