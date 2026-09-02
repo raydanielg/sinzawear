@@ -143,7 +143,7 @@ export default function EmployeeLoanPage() {
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetContent className="w-full sm:max-w-md overflow-y-auto"><SheetHeader><SheetTitle>New Employee Loan</SheetTitle></SheetHeader>
           <form onSubmit={handleSubmit} className="space-y-4 p-4">
-            <div className="space-y-2"><Label>Employee *</Label><Select value={formData.employeeId} onValueChange={(v) => setFormData({ ...formData, employeeId: v })}><SelectTrigger><SelectValue placeholder="Select employee" /></SelectTrigger><SelectContent>{employees.map((e) => <SelectItem key={e.id} value={e.id}>{e.fullName || `${e.firstName} ${e.lastName}`}</SelectItem>)}</SelectContent></Select></div>
+            <div className="space-y-2"><Label>Employee *</Label><Select value={formData.employeeId} onValueChange={(v) => setFormData({ ...formData, employeeId: v })} items={Object.fromEntries(employees.map((e) => [e.id, e.fullName || `${e.firstName} ${e.lastName}`]))}><SelectTrigger><SelectValue placeholder="Select employee" /></SelectTrigger><SelectContent>{employees.map((e) => <SelectItem key={e.id} value={e.id}>{e.fullName || `${e.firstName} ${e.lastName}`}</SelectItem>)}</SelectContent></Select></div>
             <div className="space-y-2"><Label>Principal Amount (TZS) *</Label><Input type="number" min="0" value={formData.principalAmount} onChange={(e) => setFormData({ ...formData, principalAmount: e.target.value })} required /></div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2"><Label>Interest Rate (%)</Label><Input type="number" min="0" step="0.01" value={formData.interestRate} onChange={(e) => setFormData({ ...formData, interestRate: e.target.value })} /></div>

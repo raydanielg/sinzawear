@@ -357,7 +357,7 @@ export default function EmployeesPage() {
               </div>
               <div className="space-y-2">
                 <Label>Department</Label>
-                <Select value={formData.departmentId} onValueChange={(v) => setFormData({ ...formData, departmentId: v })}>
+                <Select value={formData.departmentId} onValueChange={(v) => setFormData({ ...formData, departmentId: v })} items={Object.fromEntries(departments.map((d) => [d.id, d.name]))}>
                   <SelectTrigger><SelectValue placeholder="Select department" /></SelectTrigger>
                   <SelectContent>
                     {departments.map((d) => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}
@@ -396,7 +396,7 @@ export default function EmployeesPage() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label>Branch</Label>
-                <Select value={formData.branchId} onValueChange={(v) => setFormData({ ...formData, branchId: v })}>
+                <Select value={formData.branchId} onValueChange={(v) => setFormData({ ...formData, branchId: v })} items={Object.fromEntries(branches.map((b) => [b.id, b.name]))}>
                   <SelectTrigger><SelectValue placeholder="Select branch" /></SelectTrigger>
                   <SelectContent>
                     {branches.map((b) => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}

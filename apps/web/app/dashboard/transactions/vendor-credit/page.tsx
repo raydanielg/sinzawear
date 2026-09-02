@@ -128,7 +128,7 @@ export default function VendorCreditPage() {
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetContent className="w-full sm:max-w-md overflow-y-auto"><SheetHeader><SheetTitle>New Vendor Credit</SheetTitle></SheetHeader>
           <form onSubmit={handleSubmit} className="space-y-4 p-4">
-            <div className="space-y-2"><Label>Supplier *</Label><Select value={formData.supplierId} onValueChange={(v) => setFormData({ ...formData, supplierId: v })}><SelectTrigger><SelectValue placeholder="Select supplier" /></SelectTrigger><SelectContent>{suppliers.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent></Select></div>
+            <div className="space-y-2"><Label>Supplier *</Label><Select value={formData.supplierId} onValueChange={(v) => setFormData({ ...formData, supplierId: v })} items={Object.fromEntries(suppliers.map((s) => [s.id, s.name]))}><SelectTrigger><SelectValue placeholder="Select supplier" /></SelectTrigger><SelectContent>{suppliers.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent></Select></div>
             <div className="space-y-2"><Label>Amount (TZS) *</Label><Input type="number" min="0" value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: e.target.value })} required /></div>
             <div className="space-y-2"><Label>Reason *</Label><Input value={formData.reason} onChange={(e) => setFormData({ ...formData, reason: e.target.value })} placeholder="Reason for vendor credit" required /></div>
             <SheetFooter><Button type="submit" disabled={saving} className="w-full">{saving ? "Creating..." : "Create Vendor Credit"}</Button></SheetFooter>

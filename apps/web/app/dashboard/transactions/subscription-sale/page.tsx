@@ -137,7 +137,7 @@ export default function SubscriptionSalePage() {
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetContent className="w-full sm:max-w-md overflow-y-auto"><SheetHeader><SheetTitle>New Subscription</SheetTitle></SheetHeader>
           <form onSubmit={handleSubmit} className="space-y-4 p-4">
-            <div className="space-y-2"><Label>Customer *</Label><Select value={formData.customerId} onValueChange={(v) => setFormData({ ...formData, customerId: v })}><SelectTrigger><SelectValue placeholder="Select customer" /></SelectTrigger><SelectContent>{customers.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent></Select></div>
+            <div className="space-y-2"><Label>Customer *</Label><Select value={formData.customerId} onValueChange={(v) => setFormData({ ...formData, customerId: v })} items={Object.fromEntries(customers.map((c) => [c.id, c.name]))}><SelectTrigger><SelectValue placeholder="Select customer" /></SelectTrigger><SelectContent>{customers.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent></Select></div>
             <div className="space-y-2"><Label>Plan Name *</Label><Input value={formData.planName} onChange={(e) => setFormData({ ...formData, planName: e.target.value })} placeholder="e.g. Premium Monthly" required /></div>
             <div className="space-y-2"><Label>Amount (TZS) *</Label><Input type="number" min="0" value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: e.target.value })} required /></div>
             <div className="grid grid-cols-2 gap-3">

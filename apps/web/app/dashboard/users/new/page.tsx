@@ -117,7 +117,7 @@ export default function NewStaffPage() {
               </div>
               <div className="space-y-2">
                 <Label>Branch</Label>
-                <Select value={formData.branchId} onValueChange={(v) => setFormData({ ...formData, branchId: v })}>
+                <Select value={formData.branchId} onValueChange={(v) => setFormData({ ...formData, branchId: v })} items={Object.fromEntries(branches.map((b) => [b.id, b.name]))}>
                   <SelectTrigger><SelectValue placeholder="Select branch" /></SelectTrigger>
                   <SelectContent>
                     {branches.map((b) => (

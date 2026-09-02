@@ -22,6 +22,7 @@ import { Badge } from "@workspace/ui/components/badge"
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -226,7 +227,9 @@ function DashboardInner({ children, breadcrumbs }: DashboardLayoutProps) {
                   </span>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Select Branch</DropdownMenuLabel>
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel>Select Branch</DropdownMenuLabel>
+                </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => setSelectedBranch("all")}>All Branches</DropdownMenuItem>
                 {branches.map((b) => (
@@ -241,7 +244,9 @@ function DashboardInner({ children, breadcrumbs }: DashboardLayoutProps) {
                 <span className="hidden sm:inline">Quick Actions</span>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>Create New</DropdownMenuLabel>
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel>Create New</DropdownMenuLabel>
+                </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => router.push("/dashboard/invoices/new")}>
                   <HugeiconsIcon icon={FileAddIcon} strokeWidth={2} className="size-4" /> Add Invoice
@@ -321,7 +326,9 @@ function DashboardInner({ children, breadcrumbs }: DashboardLayoutProps) {
                   )}
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-72 sm:w-80">
-                <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+                </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 {notifications.length === 0 ? (
                   <div className="p-4 text-center text-sm text-muted-foreground">No notifications</div>
@@ -345,12 +352,14 @@ function DashboardInner({ children, breadcrumbs }: DashboardLayoutProps) {
                   </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium">{user?.name || "User"}</span>
-                    <span className="text-xs text-muted-foreground">{user?.email || ""}</span>
-                  </div>
-                </DropdownMenuLabel>
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium">{user?.name || "User"}</span>
+                      <span className="text-xs text-muted-foreground">{user?.email || ""}</span>
+                    </div>
+                  </DropdownMenuLabel>
+                </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => router.push("/dashboard/profile")}>
                   <HugeiconsIcon icon={UserCircleIcon} strokeWidth={2} className="size-4" /> Profile
