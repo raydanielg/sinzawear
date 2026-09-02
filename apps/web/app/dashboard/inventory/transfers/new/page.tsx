@@ -11,7 +11,7 @@ import { Textarea } from "@workspace/ui/components/textarea"
 import { toast } from "sonner"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { ArrowLeft01Icon, PlusIcon, Delete02Icon } from "@hugeicons/core-free-icons"
-import { api } from "@/lib/api"
+import { api, getBranches } from "@/lib/api"
 import type { Branch, Product } from "@/lib/types"
 
 interface TransferItem {
@@ -32,11 +32,11 @@ export default function NewTransferPage() {
   useEffect(() => {
     async function fetchMeta() {
       try {
-        const [branchRes, prodRes] = await Promise.all([
-          api.get("/branches"),
+        const [branchList, prodRes] = await Promise.all([
+          getBranches(),
           api.get("/products"),
         ])
-        if (branchRes.success) setBranches(branchRes.data.branches || [])
+        setBranches(branchList)
         if (prodRes.success) setProducts(prodRes.data.products || [])
       } catch {}
     }

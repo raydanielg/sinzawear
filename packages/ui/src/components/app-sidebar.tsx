@@ -357,16 +357,33 @@ const data = {
   ],
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({
+  branches: propBranches,
+  selectedBranch: propSelectedBranch,
+  onSelectBranch,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & {
+  branches?: { id: string; name: string; code?: string }[]
+  selectedBranch?: string
+  onSelectBranch?: (id: string) => void
+}) {
   const [user, setUser] = React.useState({
     name: "User",
     email: "user@sinza.co.tz",
     avatar: "",
   })
-  const [branches, setBranches] = React.useState<{ id: string; name: string; code?: string }[]>([])
-  const [selectedBranch, setSelectedBranch] = React.useState<string>("all")
+  const [branches, setBranches] = React.useState<{ id: string; name: string; code?: string }[]>(propBranches || [])
+  const [selectedBranch, setSelectedBranch] = React.useState<string>(propSelectedBranch || "all")
   const [companies, setCompanies] = React.useState<{ id: string; name: string; plan: string }[]>([])
   const [activeCompanyId, setActiveCompanyId] = React.useState<string | undefined>()
+
+  React.useEffect(() => {
+    if (propBranches) setBranches(propBranches)
+  }, [propBranches])
+
+  React.useEffect(() => {
+    if (propSelectedBranch !== undefined) setSelectedBranch(propSelectedBranch)
+  }, [propSelectedBranch])
 
   React.useEffect(() => {
     if (typeof window !== "undefined") {
@@ -383,20 +400,23 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       }
       const storedBranch = localStorage.getItem("selectedBranch")
       if (storedBranch) setSelectedBranch(storedBranch)
+
+      function syncBranch() {
+        const v = localStorage.getItem("selectedBranch")
+        setSelectedBranch(v || "all")
+      }
+      window.addEventListener("branchChanged", syncBranch)
+      return () => window.removeEventListener("branchChanged", syncBranch)
     }
   }, [])
 
   React.useEffect(() => {
-    async function fetchMeta() {
+    async function fetchCompany() {
       try {
         const token = localStorage.getItem("token")
         if (!token) return
         const headers = { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }
-        const [branchRes, companyRes] = await Promise.all([
-          fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://178-104-240-146.sslip.io/api/v1"}/branches`, { headers }).then(r => r.json()).catch(() => ({ success: false })),
-          fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://178-104-240-146.sslip.io/api/v1"}/company`, { headers }).then(r => r.json()).catch(() => ({ success: false })),
-        ])
-        if (branchRes.success) setBranches(branchRes.data.branches || [])
+        const companyRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://178-104-240-146.sslip.io/api/v1"}/company`, { headers }).then(r => r.json()).catch(() => ({ success: false }))
         if (companyRes.success && companyRes.data) {
           const c = companyRes.data
           setCompanies([{ id: c.id, name: c.name || "Sinza Fashion", plan: c.industry || "Retail Management" }])
@@ -404,7 +424,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         }
       } catch {}
     }
-    fetchMeta()
+    fetchCompany()
   }, [])
 
   function handleSelectBranch(id: string) {
@@ -413,6 +433,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       localStorage.setItem("selectedBranch", id)
       window.dispatchEvent(new Event("branchChanged"))
     }
+    onSelectBranch?.(id)
   }
 
   const teams = companies.length > 0 ? companies : data.teams.map((t) => ({ ...t, id: "default" }))

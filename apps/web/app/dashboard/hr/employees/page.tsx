@@ -15,7 +15,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@work
 import { toast } from "sonner"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { UserGroupIcon, UserAddIcon, Search01Icon, EyeIcon, Edit02Icon, TrashIcon, Download04Icon } from "@hugeicons/core-free-icons"
-import { api, formatTZS, formatDate, withBranch } from "@/lib/api"
+import { api, formatTZS, formatDate, withBranch, getBranches } from "@/lib/api"
 import { useBranch } from "@/lib/branch-context"
 import type { Employee, Department, Branch } from "@/lib/types"
 import jsPDF from "jspdf"
@@ -46,14 +46,14 @@ export default function EmployeesPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [empRes, deptRes, branchRes] = await Promise.all([
+        const [empRes, deptRes, branchList] = await Promise.all([
           api.get(withBranch("/hr/employees", branchParam)).catch(() => ({ success: false })),
           api.get("/hr/departments").catch(() => ({ success: false })),
-          api.get("/branches").catch(() => ({ success: false })),
+          getBranches().catch(() => []),
         ])
         if (empRes.success) setEmployees(empRes.data.employees || [])
         if (deptRes.success) setDepartments(deptRes.data.departments || [])
-        if (branchRes.success) setBranches(branchRes.data.branches || [])
+        setBranches(branchList)
       } catch {
       } finally {
         setLoading(false)
@@ -307,11 +307,12 @@ export default function EmployeesPage() {
       </Card>
 
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-        <SheetContent side="right" className="w-full sm:max-w-lg overflow-y-auto">
+        <SheetContent side="right" className="w-full sm:max-w-lg flex flex-col">
           <SheetHeader>
             <SheetTitle>{editing ? "Edit Employee" : "Add Employee"}</SheetTitle>
           </SheetHeader>
-          <form onSubmit={handleSubmit} className="space-y-4 p-4">
+          <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+            <div className="flex-1 space-y-4 overflow-y-auto p-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label>First Name *</Label>
@@ -419,7 +420,8 @@ export default function EmployeesPage() {
               <Label>Address</Label>
               <Input value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} />
             </div>
-            <SheetFooter className="gap-2">
+            </div>
+            <SheetFooter className="border-t gap-2">
               <Button type="button" variant="outline" onClick={() => setSheetOpen(false)}>Cancel</Button>
               <Button type="submit" disabled={saving}>{saving ? "Saving..." : editing ? "Update Employee" : "Add Employee"}</Button>
             </SheetFooter>

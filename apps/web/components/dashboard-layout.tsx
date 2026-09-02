@@ -71,7 +71,7 @@ interface DashboardLayoutProps {
 
 function DashboardInner({ children, breadcrumbs }: DashboardLayoutProps) {
   const router = useRouter()
-  const { selectedBranch, setSelectedBranch, branches, setBranches } = useBranch()
+  const { selectedBranch, setSelectedBranch, branches } = useBranch()
   const { resolvedTheme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
@@ -116,17 +116,13 @@ function DashboardInner({ children, breadcrumbs }: DashboardLayoutProps) {
   useEffect(() => {
     const u = getUser()
     if (u) setUser(u)
-    async function fetchMeta() {
+    async function fetchNotifs() {
       try {
-        const [branchRes, notifRes] = await Promise.all([
-          api.get("/branches"),
-          api.get("/notifications"),
-        ])
-        if (branchRes.success) setBranches(branchRes.data.branches || [])
+        const notifRes = await api.get("/notifications")
         if (notifRes.success) setNotifications(notifRes.data.notifications || [])
       } catch {}
     }
-    fetchMeta()
+    fetchNotifs()
   }, [])
 
   const unreadCount = notifications.filter((n) => !n.isRead).length
@@ -138,7 +134,11 @@ function DashboardInner({ children, breadcrumbs }: DashboardLayoutProps) {
 
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar
+        branches={branches}
+        selectedBranch={selectedBranch}
+        onSelectBranch={setSelectedBranch}
+      />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-1 sm:gap-2 border-b px-2 sm:px-4">
           <SidebarTrigger className="-ms-1" />

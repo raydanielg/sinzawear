@@ -12,7 +12,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@work
 import { toast } from "sonner"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { PlusIcon, Store02Icon, MapPinIcon, PhoneIcon, Edit02Icon, TrashIcon } from "@hugeicons/core-free-icons"
-import { api, formatTZS, formatDate } from "@/lib/api"
+import { api, formatTZS, formatDate, getBranches, invalidateBranchesCache } from "@/lib/api"
 import type { Branch } from "@/lib/types"
 import {
   DropdownMenu,
@@ -33,8 +33,8 @@ export default function BranchesPage() {
   useEffect(() => {
     async function fetchBranches() {
       try {
-        const res = await api.get("/branches")
-        if (res.success) setBranches(res.data.branches || [])
+        const list = await getBranches()
+        setBranches(list)
       } catch {
       } finally {
         setLoading(false)
@@ -74,8 +74,9 @@ export default function BranchesPage() {
         toast.success(editingBranch ? "Branch updated!" : "Branch added!")
         setDialogOpen(false)
         setFormData({ name: "", code: "", location: "", phone: "", openingBalance: "0" })
-        const refresh = await api.get("/branches")
-        if (refresh.success) setBranches(refresh.data.branches || [])
+        invalidateBranchesCache()
+        const refresh = await getBranches()
+        setBranches(refresh)
       } else {
         toast.error(res.message || "Failed to save branch")
       }
@@ -201,9 +202,10 @@ export default function BranchesPage() {
       )}
 
       <Sheet open={dialogOpen} onOpenChange={setDialogOpen}>
-        <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+        <SheetContent side="right" className="w-full sm:max-w-md flex flex-col">
           <SheetHeader><SheetTitle>{editingBranch ? "Edit Branch" : "Add Branch"}</SheetTitle></SheetHeader>
-          <form onSubmit={handleAdd} className="space-y-4">
+          <form onSubmit={handleAdd} className="flex flex-col flex-1 overflow-hidden">
+            <div className="flex-1 space-y-4 overflow-y-auto p-4">
             <div className="space-y-2">
               <Label>Name *</Label>
               <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Branch name" required />
@@ -224,7 +226,8 @@ export default function BranchesPage() {
               <Label>Opening Balance (TZS)</Label>
               <Input type="number" min="0" value={formData.openingBalance} onChange={(e) => setFormData({ ...formData, openingBalance: e.target.value })} />
             </div>
-            <SheetFooter className="mt-auto pt-4">
+            </div>
+            <SheetFooter className="border-t">
               <div className="flex flex-col gap-2">
                 <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
                 <Button type="submit" disabled={saving}>{saving ? "Saving..." : editingBranch ? "Save Changes" : "Add Branch"}</Button>

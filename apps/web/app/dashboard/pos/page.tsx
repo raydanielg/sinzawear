@@ -281,11 +281,12 @@ export default function POSPage() {
       </div>
 
       <Sheet open={checkoutOpen} onOpenChange={setCheckoutOpen}>
-        <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+        <SheetContent side="right" className="w-full sm:max-w-md flex flex-col">
           <SheetHeader>
             <SheetTitle>Checkout</SheetTitle>
           </SheetHeader>
-          <div className="space-y-4">
+          <div className="flex flex-col flex-1 overflow-hidden">
+            <div className="flex-1 space-y-4 overflow-y-auto p-4">
             <div className="rounded-lg bg-primary/10 p-4 text-center">
               <p className="text-sm text-muted-foreground">Total Amount</p>
               <p className="text-3xl font-bold">{formatTZS(total)}</p>
@@ -312,15 +313,16 @@ export default function POSPage() {
                 </div>
               </>
             )}
-          </div>
-          <SheetFooter className="mt-auto pt-4">
-            <div className="flex flex-col gap-2">
-              <Button variant="outline" onClick={() => setCheckoutOpen(false)}>Cancel</Button>
-              <Button onClick={completeSale} disabled={processing || (paymentMethod === "cash" && amountReceived < total)}>
-                {processing ? "Processing..." : "Complete Payment"}
-              </Button>
             </div>
-          </SheetFooter>
+            <SheetFooter className="border-t">
+              <div className="flex flex-col gap-2">
+                <Button variant="outline" onClick={() => setCheckoutOpen(false)}>Cancel</Button>
+                <Button onClick={completeSale} disabled={processing || (paymentMethod === "cash" && amountReceived < total)}>
+                  {processing ? "Processing..." : "Complete Payment"}
+                </Button>
+              </div>
+            </SheetFooter>
+          </div>
         </SheetContent>
       </Sheet>
     </DashboardLayout>

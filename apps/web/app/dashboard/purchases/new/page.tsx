@@ -11,7 +11,7 @@ import { Textarea } from "@workspace/ui/components/textarea"
 import { toast } from "sonner"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { ArrowLeft01Icon, PlusIcon, Delete02Icon } from "@hugeicons/core-free-icons"
-import { api, formatTZS } from "@/lib/api"
+import { api, formatTZS, getBranches } from "@/lib/api"
 import type { Supplier, Branch, Product } from "@/lib/types"
 
 interface PurchaseItem {
@@ -37,13 +37,13 @@ export default function NewPurchasePage() {
   useEffect(() => {
     async function fetchMeta() {
       try {
-        const [supRes, branchRes, prodRes] = await Promise.all([
+        const [supRes, branchList, prodRes] = await Promise.all([
           api.get("/suppliers"),
-          api.get("/branches"),
+          getBranches(),
           api.get("/products"),
         ])
         if (supRes.success) setSuppliers(supRes.data.suppliers || [])
-        if (branchRes.success) setBranches(branchRes.data.branches || [])
+        setBranches(branchList)
         if (prodRes.success) setProducts(prodRes.data.products || [])
       } catch {}
     }

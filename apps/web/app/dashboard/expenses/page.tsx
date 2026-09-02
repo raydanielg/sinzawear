@@ -13,7 +13,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@work
 import { toast } from "sonner"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { PlusIcon, CoinsIcon, Search01Icon, TrashIcon } from "@hugeicons/core-free-icons"
-import { api, formatTZS, formatDate, withBranch } from "@/lib/api"
+import { api, formatTZS, formatDate, withBranch, getBranches } from "@/lib/api"
 import type { Expense, Branch } from "@/lib/types"
 import { useBranch } from "@/lib/branch-context"
 import {
@@ -36,12 +36,12 @@ export default function ExpensesPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [expRes, branchRes] = await Promise.all([
+        const [expRes, branchList] = await Promise.all([
           api.get(withBranch("/expenses", branchParam)),
-          api.get("/branches"),
+          getBranches(),
         ])
         if (expRes.success) setExpenses(expRes.data.expenses || [])
-        if (branchRes.success) setBranches(branchRes.data.branches || [])
+        setBranches(branchList)
       } catch {
       } finally {
         setLoading(false)
@@ -211,33 +211,35 @@ export default function ExpensesPage() {
       </Card>
 
       <Sheet open={dialogOpen} onOpenChange={setDialogOpen}>
-        <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+        <SheetContent side="right" className="w-full sm:max-w-md flex flex-col">
           <SheetHeader><SheetTitle>Add Expense</SheetTitle></SheetHeader>
-          <form onSubmit={handleAdd} className="space-y-4">
-            <div className="space-y-2">
-              <Label>Amount (TZS) *</Label>
-              <Input type="number" min="0" value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: e.target.value })} placeholder="0" required />
+          <form onSubmit={handleAdd} className="flex flex-col flex-1 overflow-hidden">
+            <div className="flex-1 space-y-4 overflow-y-auto p-4">
+              <div className="space-y-2">
+                <Label>Amount (TZS) *</Label>
+                <Input type="number" min="0" value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: e.target.value })} placeholder="0" required />
+              </div>
+              <div className="space-y-2">
+                <Label>Description *</Label>
+                <Input value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Expense description" required />
+              </div>
+              <div className="space-y-2">
+                <Label>Category</Label>
+                <Input value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} placeholder="e.g. Rent, Utilities, Transport" />
+              </div>
+              <div className="space-y-2">
+                <Label>Branch</Label>
+                <select className="h-9 w-full rounded-md border bg-background px-3 text-sm" value={formData.branchId} onChange={(e) => setFormData({ ...formData, branchId: e.target.value })}>
+                  <option value="">All branches</option>
+                  {branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+                </select>
+              </div>
+              <div className="space-y-2">
+                <Label>Date</Label>
+                <Input type="date" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} />
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label>Description *</Label>
-              <Input value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Expense description" required />
-            </div>
-            <div className="space-y-2">
-              <Label>Category</Label>
-              <Input value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} placeholder="e.g. Rent, Utilities, Transport" />
-            </div>
-            <div className="space-y-2">
-              <Label>Branch</Label>
-              <select className="h-9 w-full rounded-md border bg-background px-3 text-sm" value={formData.branchId} onChange={(e) => setFormData({ ...formData, branchId: e.target.value })}>
-                <option value="">All branches</option>
-                {branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
-              </select>
-            </div>
-            <div className="space-y-2">
-              <Label>Date</Label>
-              <Input type="date" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} />
-            </div>
-            <SheetFooter className="mt-auto pt-4">
+            <SheetFooter className="border-t">
               <div className="flex flex-col gap-2">
                 <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
                 <Button type="submit" disabled={saving}>{saving ? "Saving..." : "Add Expense"}</Button>

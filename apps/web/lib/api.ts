@@ -85,3 +85,28 @@ export function formatDateTime(date: string | Date) {
     minute: "2-digit",
   })
 }
+
+let _branchesCache: any[] | null = null
+let _branchesPromise: Promise<any[]> | null = null
+
+export async function getBranches(): Promise<any[]> {
+  if (_branchesCache) return _branchesCache
+  if (_branchesPromise) return _branchesPromise
+  _branchesPromise = (async (): Promise<any[]> => {
+    try {
+      const res = await api.get("/branches")
+      if (res.success) {
+        _branchesCache = res.data.branches || []
+        return _branchesCache as any[]
+      }
+    } catch {}
+    return []
+  })()
+  const result = await _branchesPromise
+  _branchesPromise = null
+  return result
+}
+
+export function invalidateBranchesCache() {
+  _branchesCache = null
+}

@@ -14,7 +14,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@work
 import { toast } from "sonner"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { CashierIcon, PlayIcon, StopIcon, EyeIcon } from "@hugeicons/core-free-icons"
-import { api, formatTZS, formatDateTime } from "@/lib/api"
+import { api, formatTZS, formatDateTime, getBranches } from "@/lib/api"
 import type { CashSession, Branch } from "@/lib/types"
 
 export default function CashRegisterPage() {
@@ -28,12 +28,12 @@ export default function CashRegisterPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [sessRes, branchRes] = await Promise.all([
+        const [sessRes, branchList] = await Promise.all([
           api.get("/cash-register/sessions"),
-          api.get("/branches"),
+          getBranches(),
         ])
         if (sessRes.success) setSessions(sessRes.data.sessions || [])
-        if (branchRes.success) setBranches(branchRes.data.branches || [])
+        setBranches(branchList)
       } catch {
       } finally {
         setLoading(false)
@@ -198,15 +198,17 @@ export default function CashRegisterPage() {
       </Card>
 
       <Sheet open={dialogOpen} onOpenChange={setDialogOpen}>
-        <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+        <SheetContent side="right" className="w-full sm:max-w-md flex flex-col">
           <SheetHeader><SheetTitle>Open Cash Session</SheetTitle></SheetHeader>
-          <form onSubmit={handleOpenSession} className="space-y-4">
+          <form onSubmit={handleOpenSession} className="flex flex-col flex-1 overflow-hidden">
+            <div className="flex-1 space-y-4 overflow-y-auto p-4">
             <div className="space-y-2">
               <Label>Opening Float (TZS)</Label>
               <Input type="number" min="0" value={openAmount} onChange={(e) => setOpenAmount(e.target.value)} placeholder="0" />
               <p className="text-xs text-muted-foreground">Count the cash in the drawer and enter the amount</p>
             </div>
-            <SheetFooter className="mt-auto pt-4">
+            </div>
+            <SheetFooter className="border-t">
               <div className="flex flex-col gap-2">
                 <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
                 <Button type="submit" disabled={saving}>{saving ? "Opening..." : "Open Session"}</Button>

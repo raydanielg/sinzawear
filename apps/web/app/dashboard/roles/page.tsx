@@ -149,9 +149,10 @@ export default function RolesPage() {
       </Card>
 
       <Sheet open={dialogOpen} onOpenChange={setDialogOpen}>
-        <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+        <SheetContent side="right" className="w-full sm:max-w-md flex flex-col">
           <SheetHeader><SheetTitle>Add Role</SheetTitle></SheetHeader>
-          <form onSubmit={handleAdd} className="space-y-4">
+          <form onSubmit={handleAdd} className="flex flex-col flex-1 overflow-hidden">
+            <div className="flex-1 space-y-4 overflow-y-auto p-4">
             <div className="space-y-2">
               <Label>Name *</Label>
               <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="e.g. Branch Manager" required />
@@ -176,7 +177,8 @@ export default function RolesPage() {
                 ))}
               </div>
             </div>
-            <SheetFooter className="mt-auto pt-4">
+            </div>
+            <SheetFooter className="border-t">
               <div className="flex flex-col gap-2">
                 <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
                 <Button type="submit" disabled={saving}>{saving ? "Saving..." : "Create Role"}</Button>

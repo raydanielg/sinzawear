@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { toast } from "sonner"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { PlusIcon, Settings02Icon } from "@hugeicons/core-free-icons"
-import { api, formatDateTime, withBranch } from "@/lib/api"
+import { api, formatDateTime, withBranch, getBranches } from "@/lib/api"
 import type { StockMovement, Product, Branch } from "@/lib/types"
 import { useBranch } from "@/lib/branch-context"
 
@@ -31,14 +31,14 @@ export default function AdjustmentsPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [adjRes, prodRes, branchRes] = await Promise.all([
+        const [adjRes, prodRes, branchList] = await Promise.all([
           api.get(withBranch("/inventory/movements?type=adjustment", branchParam)),
           api.get(withBranch("/products", branchParam)),
-          api.get("/branches"),
+          getBranches(),
         ])
         if (adjRes.success) setAdjustments(adjRes.data.movements || [])
         if (prodRes.success) setProducts(prodRes.data.products || [])
-        if (branchRes.success) setBranches(branchRes.data.branches || [])
+        setBranches(branchList)
       } catch {
       } finally {
         setLoading(false)

@@ -13,7 +13,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@work
 import { toast } from "sonner"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { PlusIcon, UserGroupIcon, Search01Icon, Edit02Icon, TrashIcon } from "@hugeicons/core-free-icons"
-import { api, formatDate } from "@/lib/api"
+import { api, formatDate, getBranches } from "@/lib/api"
 import type { User, Branch } from "@/lib/types"
 import {
   DropdownMenu,
@@ -44,12 +44,12 @@ export default function UsersPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [userRes, branchRes] = await Promise.all([
+        const [userRes, branchList] = await Promise.all([
           api.get("/users"),
-          api.get("/branches"),
+          getBranches(),
         ])
         if (userRes.success) setUsers(userRes.data.users || [])
-        if (branchRes.success) setBranches(branchRes.data.branches || [])
+        setBranches(branchList)
       } catch {
       } finally {
         setLoading(false)
@@ -240,9 +240,10 @@ export default function UsersPage() {
       </Card>
 
       <Sheet open={dialogOpen} onOpenChange={setDialogOpen}>
-        <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+        <SheetContent side="right" className="w-full sm:max-w-md flex flex-col">
           <SheetHeader><SheetTitle>{editingUser ? "Edit User" : "Add User"}</SheetTitle></SheetHeader>
-          <form onSubmit={handleAdd} className="space-y-4">
+          <form onSubmit={handleAdd} className="flex flex-col flex-1 overflow-hidden">
+            <div className="flex-1 space-y-4 overflow-y-auto p-4">
             <div className="space-y-2">
               <Label>Name *</Label>
               <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Full name" required />
@@ -280,7 +281,8 @@ export default function UsersPage() {
                 {branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
               </select>
             </div>
-            <SheetFooter className="mt-auto pt-4">
+            </div>
+            <SheetFooter className="border-t">
               <div className="flex flex-col gap-2">
                 <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
                 <Button type="submit" disabled={saving}>{saving ? "Saving..." : editingUser ? "Save Changes" : "Add User"}</Button>

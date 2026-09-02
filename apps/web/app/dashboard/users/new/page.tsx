@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { UserGroupIcon, ArrowLeftIcon } from "@hugeicons/core-free-icons"
-import { api } from "@/lib/api"
+import { api, getBranches } from "@/lib/api"
 import type { Branch } from "@/lib/types"
 import Link from "next/link"
 
@@ -22,8 +22,8 @@ export default function NewStaffPage() {
   useEffect(() => {
     async function fetchBranches() {
       try {
-        const res = await api.get("/branches")
-        if (res.success) setBranches(res.data.branches || [])
+        const list = await getBranches()
+        setBranches(list)
       } catch {}
     }
     fetchBranches()

@@ -33,7 +33,7 @@ import {
   Store02Icon,
   File02Icon,
 } from "@hugeicons/core-free-icons"
-import { api, formatTZS, formatDateTime, withBranch } from "@/lib/api"
+import { api, formatTZS, formatDateTime, withBranch, getBranches } from "@/lib/api"
 import type { DashboardData, Sale, BranchStock } from "@/lib/types"
 import { useBranch } from "@/lib/branch-context"
 
@@ -48,16 +48,16 @@ export default function DashboardPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [dashRes, salesRes, lowStockRes, branchRes] = await Promise.all([
+        const [dashRes, salesRes, lowStockRes, branchList] = await Promise.all([
           api.get(withBranch("/reports/dashboard", branchParam)),
           api.get(withBranch("/sales", branchParam)),
           api.get(withBranch("/inventory/low-stock", branchParam)),
-          api.get("/branches"),
+          getBranches(),
         ])
         if (dashRes.success) setStats(dashRes.data)
         if (salesRes.success) setRecentSales((salesRes.data.sales || []).slice(0, 6))
         if (lowStockRes.success) setLowStock(lowStockRes.data.lowStock || [])
-        if (branchRes.success) setBranches(branchRes.data.branches || [])
+        setBranches(branchList)
       } catch {
       } finally {
         setLoading(false)

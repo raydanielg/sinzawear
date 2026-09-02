@@ -191,11 +191,12 @@ export default function CustomersPage() {
       </Card>
 
       <Sheet open={dialogOpen} onOpenChange={setDialogOpen}>
-        <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+        <SheetContent side="right" className="w-full sm:max-w-md flex flex-col">
           <SheetHeader>
             <SheetTitle>{editingCustomer ? "Edit Customer" : "Add Customer"}</SheetTitle>
           </SheetHeader>
-          <form onSubmit={handleAddCustomer} className="space-y-4">
+          <form onSubmit={handleAddCustomer} className="flex flex-col flex-1 overflow-hidden">
+            <div className="flex-1 space-y-4 overflow-y-auto p-4">
             <div className="space-y-2">
               <Label>Name *</Label>
               <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Customer name" required />
@@ -212,7 +213,8 @@ export default function CustomersPage() {
               <Label>Address</Label>
               <Input value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} placeholder="Address" />
             </div>
-            <SheetFooter className="mt-auto pt-4">
+            </div>
+            <SheetFooter className="border-t">
               <div className="flex flex-col gap-2">
                 <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
                 <Button type="submit" disabled={saving}>{saving ? "Saving..." : editingCustomer ? "Save Changes" : "Add Customer"}</Button>

@@ -11,7 +11,7 @@ import { Badge } from "@workspace/ui/components/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@workspace/ui/components/table"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { UserGroupIcon, Store02Icon, BanknoteIcon, CalendarRemove01Icon, ChartIcon, RefreshIcon } from "@hugeicons/core-free-icons"
-import { api, formatTZS, withBranch } from "@/lib/api"
+import { api, formatTZS, withBranch, getBranches } from "@/lib/api"
 import { useBranch } from "@/lib/branch-context"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import type { Employee, Payroll, LeaveRequest, EmployeeLoan, Branch } from "@/lib/types"
@@ -43,18 +43,18 @@ export default function HrAnalyticsPage() {
     setLoading(true)
     try {
       const bp = station && station !== "all" ? station : branchParam
-      const [empRes, payRes, leaveRes, loanRes, branchRes] = await Promise.all([
+      const [empRes, payRes, leaveRes, loanRes, branchList] = await Promise.all([
         api.get(withBranch("/hr/employees", bp)).catch(() => ({ success: false })),
         api.get(withBranch("/hr/payroll", bp)).catch(() => ({ success: false })),
         api.get(withBranch("/hr/leave", bp)).catch(() => ({ success: false })),
         api.get(withBranch("/transactions/employee-loan", bp)).catch(() => ({ success: false })),
-        api.get("/branches").catch(() => ({ success: false })),
+        getBranches().catch(() => []),
       ])
       if (empRes.success) setEmployees(empRes.data.employees || [])
       if (payRes.success) setPayrolls(payRes.data.payrolls || [])
       if (leaveRes.success) setLeaves(leaveRes.data.leaveRequests || [])
       if (loanRes.success) setLoans(loanRes.data.employeeLoans || loanRes.data.loans || [])
-      if (branchRes.success) setAllBranches(branchRes.data.branches || [])
+      setAllBranches(branchList)
     } catch {
     } finally {
       setLoading(false)

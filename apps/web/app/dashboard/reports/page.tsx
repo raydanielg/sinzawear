@@ -10,7 +10,7 @@ import { Label } from "@workspace/ui/components/label"
 import { Skeleton } from "@workspace/ui/components/skeleton"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { ChartIcon, CoinsIcon, Package02Icon, ShoppingBag01Icon, Store01Icon, Download04Icon, File02Icon, StarAwardIcon, UserGroupIcon, Wallet01Icon, BanknoteIcon, TruckIcon, Book01Icon, MapIcon, ReceiptIcon, Cash01Icon, TargetIcon } from "@hugeicons/core-free-icons"
-import { api, formatTZS, withBranch } from "@/lib/api"
+import { api, formatTZS, withBranch, getBranches } from "@/lib/api"
 import type { Branch } from "@/lib/types"
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
@@ -37,8 +37,8 @@ export default function ReportsPage() {
   useEffect(() => {
     async function fetchBranches() {
       try {
-        const res = await api.get("/branches")
-        if (res.success) setBranches(res.data.branches || [])
+        const list = await getBranches()
+        setBranches(list)
       } catch {}
     }
     fetchBranches()
