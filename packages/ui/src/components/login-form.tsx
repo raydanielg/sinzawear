@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { HugeiconsIcon } from "@hugeicons/react"
-import { Mail01Icon, LockPasswordIcon } from "@hugeicons/core-free-icons"
+import { Mail01Icon, LockPasswordIcon, ViewIcon, ViewOffIcon } from "@hugeicons/core-free-icons"
 import { toast } from "sonner"
 
 import { cn } from "@workspace/ui/lib/utils"
@@ -21,6 +21,7 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const [isLoading, setIsLoading] = React.useState(false)
+  const [showPassword, setShowPassword] = React.useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -111,11 +112,22 @@ export function LoginForm({
                   <Input
                     id="password"
                     name="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
                     required
-                    className="h-12 ps-10 text-base"
+                    className="h-12 ps-10 pe-10 text-base"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground transition-all duration-200 hover:text-foreground hover:scale-110 active:scale-90"
+                  >
+                    <HugeiconsIcon
+                      icon={showPassword ? ViewOffIcon : ViewIcon}
+                      strokeWidth={2}
+                      className="size-5"
+                    />
+                  </button>
                 </div>
               </Field>
               <Field>
