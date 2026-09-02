@@ -441,11 +441,11 @@ export function AppSidebar({
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher
-          teams={teams}
-          activeTeamId={activeCompanyId}
-          onSelectTeam={setActiveCompanyId}
-          onAddTeam={() => { if (typeof window !== "undefined") window.location.href = "/dashboard/settings" }}
+        <BranchSwitcher
+          branches={branches}
+          selectedBranch={selectedBranch}
+          onSelectBranch={handleSelectBranch}
+          onAddBranch={() => { if (typeof window !== "undefined") window.location.href = "/dashboard/branches" }}
         />
       </SidebarHeader>
       <SidebarContent>
@@ -453,12 +453,6 @@ export function AppSidebar({
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
-        <BranchSwitcher
-          branches={branches}
-          selectedBranch={selectedBranch}
-          onSelectBranch={handleSelectBranch}
-          onAddBranch={() => { if (typeof window !== "undefined") window.location.href = "/dashboard/branches" }}
-        />
         <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />
